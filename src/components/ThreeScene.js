@@ -26,8 +26,8 @@ const RotatingText = () => {
       anchorX="center"
       anchorY="middle"
     >
-      Yantra Inc, <br>
-Software Company of <br>Birtamod, Jhapa
+      Yantra Inc, </br>
+Software Company of  Birtamod, Jhapa
     </Text>
   );
 };
