@@ -4,7 +4,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html } from '@react-three/drei';
-import { Vector3, Color } from 'three';
+import * as THREE from 'three';
 
 const GlowingText = ({ children, position }) => {
   const textRef = useRef();
@@ -13,8 +13,8 @@ const GlowingText = ({ children, position }) => {
     if (textRef.current) {
       textRef.current.material = new THREE.ShaderMaterial({
         uniforms: {
-          glowColor: { type: 'c', value: new Color('white') },
-          viewVector: { type: 'v3', value: new Vector3(0, 0, 100) },
+          glowColor: { type: 'c', value: new THREE.Color('white') },
+          viewVector: { type: 'v3', value: new THREE.Vector3(0, 0, 100) },
         },
         vertexShader: `
           uniform vec3 viewVector;
