@@ -1,12 +1,12 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Html } from '@react-three/drei';
+import React, { useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-const GlowingText = ({ children, position }) => {
+const GlowingText = ({ children, position, fontSize }) => {
   const textRef = useRef();
 
   useEffect(() => {
@@ -45,8 +45,7 @@ const GlowingText = ({ children, position }) => {
   return (
     <Text
       ref={textRef}
-      fontSize={1}
-      color="white"
+      fontSize={fontSize}
       position={position}
       anchorX="center"
       anchorY="middle">
@@ -55,49 +54,27 @@ const GlowingText = ({ children, position }) => {
   );
 };
 
-const RotatingText = ({ onRotate }) => {
+const RotatingText = ({ rotate }) => {
   const textRef = useRef();
   const { mouse } = useThree();
-  const [fontSize, setFontSize] = useState(1);
-  const [rotationMultiplier, setRotationMultiplier] = useState(2);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Adjust font size based on window width
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setFontSize(0.5); // Smaller font size for mobile
-        setRotationMultiplier(1); // Less sensitive rotation for mobile
-      } else {
-        setFontSize(1); // Default font size for desktop
-        setRotationMultiplier(2); // Default rotation sensitivity for desktop
-      }
-    };
-
-    handleResize(); // Set initial values
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   useFrame(() => {
-    if (textRef.current && isHovered) {
-      textRef.current.rotation.y = mouse.x * rotationMultiplier;
-      textRef.current.rotation.x = -mouse.y * rotationMultiplier;
+    if (textRef.current) {
+      if (rotate) {
+        textRef.current.rotation.y += 0.01;
+      }
+      textRef.current.rotation.y = mouse.x * 0.1;
+      textRef.current.rotation.x = -mouse.y * 0.1;
     }
   });
 
   return (
     <GlowingText
       ref={textRef}
-      fontSize={fontSize}
+      fontSize={1}
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle"
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}>
+      anchorY="middle">
       Yantra Inc,{"\n"}
       Software company of{"\n"}
       Birtamode, Jhapa
@@ -105,29 +82,33 @@ const RotatingText = ({ onRotate }) => {
   );
 };
 
-const InteractiveText = ({ position, children, link, visible }) => {
+const InteractiveLinks = ({ visible }) => {
+  const positions = {
+    about: [3, 4, 0],
+    contact: [3, 3, 0],
+    privacy: [3, 2, 0],
+  };
+
   return (
-    <group>
+    <>
       {visible && (
-        <Html>
-          <a href={link} style={{ color: 'white', position: 'absolute' }}>
-            {children}
-          </a>
-        </Html>
+        <>
+          <Text position={positions.about} fontSize={0.5} color="white">
+            <a href="#about" style={{ color: 'white' }}>About</a>
+          </Text>
+          <Text position={positions.contact} fontSize={0.5} color="white">
+            <a href="#contact" style={{ color: 'white' }}>Contact</a>
+          </Text>
+          <Text position={positions.privacy} fontSize={0.5} color="white">
+            <a href="#privacy" style={{ color: 'white' }}>Privacy Policy</a>
+          </Text>
+        </>
       )}
-      <Text
-        fontSize={1}
-        color={visible ? "white" : "black"} // Hide text if not visible
-        position={position}
-        anchorX="center"
-        anchorY="middle">
-        {children}
-      </Text>
-    </group>
+    </>
   );
 };
 
-const TorchEffect = () => {
+const TorchEffect = ({ setVisible }) => {
   const torchRef = useRef();
   const { mouse } = useThree();
 
@@ -135,6 +116,9 @@ const TorchEffect = () => {
     if (torchRef.current) {
       torchRef.current.position.x = mouse.x * 10;
       torchRef.current.position.y = -mouse.y * 10;
+
+      const distance = Math.hypot(torchRef.current.position.x - 5, torchRef.current.position.y + 5);
+      setVisible(distance < 5);
     }
   });
 
@@ -150,35 +134,26 @@ const TorchEffect = () => {
   );
 };
 
-const Scene = ({ rotateText, setRotateText }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const { mouse } = useThree();
-
-  useFrame(() => {
-    const distance = Math.hypot(mouse.x * 10 - 5, mouse.y * 10 + 5);
-    setIsVisible(distance < 2); // Adjust the radius of the torch effect
-  });
-
+const Scene = ({ rotateText, setVisible }) => {
   return (
     <>
-      <TorchEffect />
-      <RotatingText onRotate={rotateText} />
-      <InteractiveText position={[4, 4, 0]} link="#about" visible={isVisible}>About</InteractiveText>
-      <InteractiveText position={[4, 3, 0]} link="#contact" visible={isVisible}>Contact</InteractiveText>
-      <InteractiveText position={[4, 2, 0]} link="#privacy" visible={isVisible}>Privacy Policy</InteractiveText>
+      <TorchEffect setVisible={setVisible} />
+      <RotatingText rotate={rotateText} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} />
     </>
   );
 };
 
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   return (
     <>
       <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
-        <Scene rotateText={rotateText} setRotateText={setRotateText} />
+        <Scene rotateText={rotateText} setVisible={setVisible} />
+        <InteractiveLinks visible={visible} />
       </Canvas>
       <button
         onClick={() => setRotateText(!rotateText)}
