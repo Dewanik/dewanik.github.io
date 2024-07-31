@@ -2,14 +2,14 @@
 
 .torch {
   position: fixed;
-  width: 50px; /* Adjusted size to make the pointer smaller */
-  height: 50px; /* Adjusted size to make the pointer smaller */
-  background: radial-gradient(circle, rgba(255,165,0,1) 0%, rgba(255,69,0,0.6) 50%, rgba(0,0,0,0) 70%);
+  width: 20px; /* Cursor-sized pointer */
+  height: 20px; /* Cursor-sized pointer */
+  background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,69,0,0.8) 50%, rgba(0,0,0,0) 70%);
   border-radius: 50%;
   pointer-events: none;
   mix-blend-mode: screen;
   animation: flicker 0.1s infinite alternate;
-  box-shadow: 0 0 20px 10px rgba(255, 69, 0, 0.5), 0 0 40px 20px rgba(255, 165, 0, 0.5); /* Adjusted shadow size */
+  box-shadow: 0 0 20px 10px rgba(255, 255, 0, 1), 0 0 40px 20px rgba(255, 165, 0, 1); /* Brighter glow */
   transform: translate(-50%, -50%);
 }
 
@@ -18,7 +18,7 @@
     transform: scale(1);
   }
   to {
-    transform: scale(1.2);
+    transform: scale(1.1); /* Slight flicker to give a glowing effect */
   }
 }
 
