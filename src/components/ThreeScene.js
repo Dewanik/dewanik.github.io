@@ -86,19 +86,21 @@ const RotatingText = ({ rotate }) => {
 const InteractiveLinks = ({ visible }) => {
   return (
     <group position={[4, 3.5, 0]}>
-      {visible && (
-        <>
-          <Html position={[0, 0.5, 0]}>
-            <a href="#about" style={{ color: 'white', fontSize: '20px' }}>About</a>
-          </Html>
-          <Html position={[0, 0, 0]}>
-            <a href="#contact" style={{ color: 'white', fontSize: '20px' }}>Contact</a>
-          </Html>
-          <Html position={[0, -0.5, 0]}>
-            <a href="#privacy" style={{ color: 'white', fontSize: '20px' }}>Privacy Policy</a>
-          </Html>
-        </>
-      )}
+      <Html position={[0, 0.5, 0]}>
+        <a href="#about" style={{ color: 'white', fontSize: '20px', opacity: visible.about ? 1 : 0 }}>
+          About
+        </a>
+      </Html>
+      <Html position={[0, 0, 0]}>
+        <a href="#contact" style={{ color: 'white', fontSize: '20px', opacity: visible.contact ? 1 : 0 }}>
+          Contact
+        </a>
+      </Html>
+      <Html position={[0, -0.5, 0]}>
+        <a href="#privacy" style={{ color: 'white', fontSize: '20px', opacity: visible.privacy ? 1 : 0 }}>
+          Privacy Policy
+        </a>
+      </Html>
     </group>
   );
 };
@@ -112,8 +114,15 @@ const TorchEffect = ({ setVisible }) => {
       torchRef.current.position.x = mouse.x * 10;
       torchRef.current.position.y = -mouse.y * 10;
 
-      const distance = Math.hypot(torchRef.current.position.x - 5, torchRef.current.position.y + 5);
-      setVisible(distance < 5);
+      const aboutDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 3.5);
+      const contactDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 3);
+      const privacyDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 2.5);
+
+      setVisible({
+        about: aboutDistance < 1.5,
+        contact: contactDistance < 1.5,
+        privacy: privacyDistance < 1.5
+      });
     }
   });
 
@@ -143,7 +152,7 @@ const Scene = ({ rotateText, setVisible }) => {
 
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState({ about: false, contact: false, privacy: false });
   const torchRef = useRef(null);
 
   useEffect(() => {
