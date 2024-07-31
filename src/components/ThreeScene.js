@@ -111,8 +111,8 @@ const TorchEffect = ({ torchPosition }) => {
       <div
         className="torch"
         style={{
-          left: torchPosition.x,
-          top: torchPosition.y,
+          left: `${torchPosition.x}px`,
+          top: `${torchPosition.y}px`,
           transform: 'translate(-50%, -50%)',
         }}
       />
@@ -152,7 +152,7 @@ const Scene = ({ rotateText, torchPosition, setVisible, visible }) => {
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
   const [visible, setVisible] = useState({ about: false, contact: false, privacy: false });
-  const [torchPosition, setTorchPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [torchPosition, setTorchPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (event) => {
