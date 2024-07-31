@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 const GlowingText = ({ children, position, fontSize }) => {
@@ -83,28 +83,22 @@ const RotatingText = ({ rotate }) => {
 };
 
 const InteractiveLinks = ({ visible }) => {
-  const positions = {
-    about: [3, 4, 0],
-    contact: [3, 3, 0],
-    privacy: [3, 2, 0],
-  };
-
   return (
-    <>
+    <group position={[4, 3.5, 0]}>
       {visible && (
         <>
-          <Text position={positions.about} fontSize={0.5} color="white">
-            <a href="#about" style={{ color: 'white' }}>About</a>
-          </Text>
-          <Text position={positions.contact} fontSize={0.5} color="white">
-            <a href="#contact" style={{ color: 'white' }}>Contact</a>
-          </Text>
-          <Text position={positions.privacy} fontSize={0.5} color="white">
-            <a href="#privacy" style={{ color: 'white' }}>Privacy Policy</a>
-          </Text>
+          <Html position={[0, 0.5, 0]}>
+            <a href="#about" style={{ color: 'white', fontSize: '20px' }}>About</a>
+          </Html>
+          <Html position={[0, 0, 0]}>
+            <a href="#contact" style={{ color: 'white', fontSize: '20px' }}>Contact</a>
+          </Html>
+          <Html position={[0, -0.5, 0]}>
+            <a href="#privacy" style={{ color: 'white', fontSize: '20px' }}>Privacy Policy</a>
+          </Html>
         </>
       )}
-    </>
+    </group>
   );
 };
 
@@ -139,6 +133,7 @@ const Scene = ({ rotateText, setVisible }) => {
     <>
       <TorchEffect setVisible={setVisible} />
       <RotatingText rotate={rotateText} />
+      <InteractiveLinks visible={setVisible} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
     </>
@@ -153,7 +148,6 @@ const ThreeScene = () => {
     <>
       <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
         <Scene rotateText={rotateText} setVisible={setVisible} />
-        <InteractiveLinks visible={visible} />
       </Canvas>
       <button
         onClick={() => setRotateText(!rotateText)}
