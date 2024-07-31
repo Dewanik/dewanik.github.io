@@ -83,23 +83,23 @@ const RotatingText = ({ rotate }) => {
   );
 };
 
-const InteractiveLinks = ({ visible }) => {
+const InteractiveLinks = ({ positions }) => {
   return (
     <div className="links-container">
-      <a href="#about" className="link" style={{ opacity: visible.about ? 1 : 0 }}>
+      <a href="#about" className="link" style={{ opacity: positions.about.opacity }}>
         About
       </a>
-      <a href="#contact" className="link" style={{ opacity: visible.contact ? 1 : 0 }}>
+      <a href="#contact" className="link" style={{ opacity: positions.contact.opacity }}>
         Contact
       </a>
-      <a href="#privacy" className="link" style={{ opacity: visible.privacy ? 1 : 0 }}>
+      <a href="#privacy" className="link" style={{ opacity: positions.privacy.opacity }}>
         Privacy Policy
       </a>
     </div>
   );
 };
 
-const TorchEffect = ({ setVisible }) => {
+const TorchEffect = ({ positions, setPositions }) => {
   const torchRef = useRef();
   const { mouse, size } = useThree();
 
@@ -113,10 +113,10 @@ const TorchEffect = ({ setVisible }) => {
       const contactDistance = Math.hypot(x - size.width + 100, y - 100);
       const privacyDistance = Math.hypot(x - size.width + 100, y - 150);
 
-      setVisible({
-        about: aboutDistance < 150,
-        contact: contactDistance < 150,
-        privacy: privacyDistance < 150
+      setPositions({
+        about: { ...positions.about, opacity: aboutDistance < 150 ? 1 : 0 },
+        contact: { ...positions.contact, opacity: contactDistance < 150 ? 1 : 0 },
+        privacy: { ...positions.privacy, opacity: privacyDistance < 150 ? 1 : 0 }
       });
     }
   });
@@ -124,24 +124,29 @@ const TorchEffect = ({ setVisible }) => {
   return <div ref={torchRef} className="torch"></div>;
 };
 
-const Scene = ({ rotateText, setVisible }) => {
+const Scene = ({ rotateText, setPositions, positions }) => {
   return (
     <>
+      <TorchEffect positions={positions} setPositions={setPositions} />
+      <RotatingText rotate={rotateText} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <RotatingText rotate={rotateText} />
     </>
   );
 };
 
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
-  const [visible, setVisible] = useState({ about: false, contact: false, privacy: false });
+  const [positions, setPositions] = useState({
+    about: { opacity: 0 },
+    contact: { opacity: 0 },
+    privacy: { opacity: 0 }
+  });
 
   return (
     <>
       <Canvas style={{ width: '100%', height: '100vh', background: '#000000', cursor: 'none' }}>
-        <Scene rotateText={rotateText} setVisible={setVisible} />
+        <Scene rotateText={rotateText} setPositions={setPositions} positions={positions} />
       </Canvas>
       <button
         onClick={() => setRotateText(!rotateText)}
@@ -157,8 +162,7 @@ const ThreeScene = () => {
       >
         Rotate Text
       </button>
-      <TorchEffect setVisible={setVisible} />
-      <InteractiveLinks visible={visible} />
+      <InteractiveLinks positions={positions} />
     </>
   );
 };
