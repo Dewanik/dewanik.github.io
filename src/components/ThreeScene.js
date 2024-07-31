@@ -85,23 +85,17 @@ const RotatingText = ({ rotate }) => {
 
 const InteractiveLinks = ({ visible }) => {
   return (
-    <group position={[4, 3.5, 0]}>
-      <Html position={[0, 0.5, 0]}>
-        <a href="#about" style={{ color: 'white', fontSize: '20px', opacity: visible.about ? 1 : 0 }}>
-          About
-        </a>
-      </Html>
-      <Html position={[0, 0, 0]}>
-        <a href="#contact" style={{ color: 'white', fontSize: '20px', opacity: visible.contact ? 1 : 0 }}>
-          Contact
-        </a>
-      </Html>
-      <Html position={[0, -0.5, 0]}>
-        <a href="#privacy" style={{ color: 'white', fontSize: '20px', opacity: visible.privacy ? 1 : 0 }}>
-          Privacy Policy
-        </a>
-      </Html>
-    </group>
+    <div className="links-container">
+      <a href="#about" className="link" style={{ opacity: visible.about ? 1 : 0 }}>
+        About
+      </a>
+      <a href="#contact" className="link" style={{ opacity: visible.contact ? 1 : 0 }}>
+        Contact
+      </a>
+      <a href="#privacy" className="link" style={{ opacity: visible.privacy ? 1 : 0 }}>
+        Privacy Policy
+      </a>
+    </div>
   );
 };
 
@@ -114,14 +108,14 @@ const TorchEffect = ({ setVisible }) => {
       torchRef.current.position.x = mouse.x * 10;
       torchRef.current.position.y = -mouse.y * 10;
 
-      const aboutDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 3.5);
-      const contactDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 3);
-      const privacyDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y - 2.5);
+      const aboutDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 3.5);
+      const contactDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 3);
+      const privacyDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 2.5);
 
       setVisible({
-        about: aboutDistance < 1.5,
-        contact: contactDistance < 1.5,
-        privacy: privacyDistance < 1.5
+        about: aboutDistance < 3,
+        contact: contactDistance < 3,
+        privacy: privacyDistance < 3
       });
     }
   });
@@ -143,7 +137,6 @@ const Scene = ({ rotateText, setVisible }) => {
     <>
       <TorchEffect setVisible={setVisible} />
       <RotatingText rotate={rotateText} />
-      <InteractiveLinks visible={setVisible} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
     </>
@@ -189,6 +182,7 @@ const ThreeScene = () => {
         Rotate Text
       </button>
       <div ref={torchRef} className="torch"></div>
+      <InteractiveLinks visible={visible} />
     </>
   );
 };
