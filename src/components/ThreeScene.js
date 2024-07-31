@@ -101,44 +101,35 @@ const InteractiveLinks = ({ visible }) => {
 
 const TorchEffect = ({ setVisible }) => {
   const torchRef = useRef();
-  const { mouse } = useThree();
+  const { mouse, size } = useThree();
 
   useFrame(() => {
     if (torchRef.current) {
-      torchRef.current.position.x = mouse.x * 10;
-      torchRef.current.position.y = -mouse.y * 10;
+      const x = (mouse.x * size.width) / 2;
+      const y = (mouse.y * size.height) / 2;
+      torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
 
-      const aboutDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 3.5);
-      const contactDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 3);
-      const privacyDistance = Math.hypot(torchRef.current.position.x - 4, torchRef.current.position.y + 2.5);
+      const aboutDistance = Math.hypot(x - size.width + 100, y - 50);
+      const contactDistance = Math.hypot(x - size.width + 100, y - 100);
+      const privacyDistance = Math.hypot(x - size.width + 100, y - 150);
 
       setVisible({
-        about: aboutDistance < 3,
-        contact: contactDistance < 3,
-        privacy: privacyDistance < 3
+        about: aboutDistance < 150,
+        contact: contactDistance < 150,
+        privacy: privacyDistance < 150
       });
     }
   });
 
-  return (
-    <spotLight
-      ref={torchRef}
-      position={[0, 0, 10]}
-      angle={0.3}
-      penumbra={1}
-      intensity={3}
-      castShadow
-    />
-  );
+  return <div ref={torchRef} className="torch"></div>;
 };
 
 const Scene = ({ rotateText, setVisible }) => {
   return (
     <>
-      <TorchEffect setVisible={setVisible} />
-      <RotatingText rotate={rotateText} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
+      <RotatingText rotate={rotateText} />
     </>
   );
 };
@@ -146,21 +137,6 @@ const Scene = ({ rotateText, setVisible }) => {
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
   const [visible, setVisible] = useState({ about: false, contact: false, privacy: false });
-  const torchRef = useRef(null);
-
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      if (torchRef.current) {
-        torchRef.current.style.left = `${event.clientX}px`;
-        torchRef.current.style.top = `${event.clientY}px`;
-      }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
 
   return (
     <>
@@ -181,7 +157,7 @@ const ThreeScene = () => {
       >
         Rotate Text
       </button>
-      <div ref={torchRef} className="torch"></div>
+      <TorchEffect setVisible={setVisible} />
       <InteractiveLinks visible={visible} />
     </>
   );
