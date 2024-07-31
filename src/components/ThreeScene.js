@@ -111,8 +111,8 @@ const TorchEffect = ({ setVisible }) => {
 
   useFrame(() => {
     if (torchRef.current) {
-      const x = (mouse.x * size.width) / 2;
-      const y = (mouse.y * size.height) / 2;
+      const x = (mouse.x * size.width) / 2 + size.width / 2;
+      const y = (mouse.y * size.height) / 2 + size.height / 2;
       torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
 
       const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
