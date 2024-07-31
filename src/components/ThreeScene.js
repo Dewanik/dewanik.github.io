@@ -57,8 +57,10 @@ const GlowingText = ({ children, position }) => {
 
 const RotatingText = ({ onRotate }) => {
   const textRef = useRef();
+  const { mouse } = useThree();
   const [fontSize, setFontSize] = useState(1);
   const [rotationMultiplier, setRotationMultiplier] = useState(2);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Adjust font size based on window width
   useEffect(() => {
@@ -81,8 +83,9 @@ const RotatingText = ({ onRotate }) => {
   }, []);
 
   useFrame(() => {
-    if (textRef.current && onRotate) {
-      textRef.current.rotation.y += 0.01;
+    if (textRef.current && isHovered) {
+      textRef.current.rotation.y = mouse.x * rotationMultiplier;
+      textRef.current.rotation.x = -mouse.y * rotationMultiplier;
     }
   });
 
@@ -92,7 +95,9 @@ const RotatingText = ({ onRotate }) => {
       fontSize={fontSize}
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle">
+      anchorY="middle"
+      onPointerOver={() => setIsHovered(true)}
+      onPointerOut={() => setIsHovered(false)}>
       Yantra Inc,{"\n"}
       Software company of{"\n"}
       Birtamode, Jhapa
@@ -145,8 +150,7 @@ const TorchEffect = () => {
   );
 };
 
-const ThreeScene = () => {
-  const [rotateText, setRotateText] = useState(false);
+const Scene = ({ rotateText, setRotateText }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { mouse } = useThree();
 
@@ -157,14 +161,24 @@ const ThreeScene = () => {
 
   return (
     <>
+      <TorchEffect />
+      <RotatingText onRotate={rotateText} />
+      <InteractiveText position={[4, 4, 0]} link="#about" visible={isVisible}>About</InteractiveText>
+      <InteractiveText position={[4, 3, 0]} link="#contact" visible={isVisible}>Contact</InteractiveText>
+      <InteractiveText position={[4, 2, 0]} link="#privacy" visible={isVisible}>Privacy Policy</InteractiveText>
+    </>
+  );
+};
+
+const ThreeScene = () => {
+  const [rotateText, setRotateText] = useState(false);
+
+  return (
+    <>
       <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
-        <TorchEffect />
-        <RotatingText onRotate={rotateText} />
-        <InteractiveText position={[4, 4, 0]} link="#about" visible={isVisible}>About</InteractiveText>
-        <InteractiveText position={[4, 3, 0]} link="#contact" visible={isVisible}>Contact</InteractiveText>
-        <InteractiveText position={[4, 2, 0]} link="#privacy" visible={isVisible}>Privacy Policy</InteractiveText>
+        <Scene rotateText={rotateText} setRotateText={setRotateText} />
       </Canvas>
       <button
         onClick={() => setRotateText(!rotateText)}
