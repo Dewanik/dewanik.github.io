@@ -25,10 +25,10 @@ const RotatingText = () => {
       position={[0, 0, 0]}
       anchorX="center"
       anchorY="middle">
-      Yantra Inc, 
+      Yantra Inc,{"\n"}
+      Software company of{"\n"}
+      Birtamode, Jhapa
     </Text>
-
-        
   );
 };
 
