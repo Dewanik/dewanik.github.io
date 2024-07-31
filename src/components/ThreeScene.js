@@ -2,15 +2,17 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text3D, Html } from '@react-three/drei';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import * as THREE from 'three';
 import './ThreeScene.css'; // Import the CSS file for styling
 
+const fontJson = require('./helvetiker_regular.typeface.json'); // Adjust the path according to your project structure
+
 const RotatingText = () => {
   const textRef = useRef();
-  const font = new FontLoader().parse(require('./helvetiker_regular.typeface.json')); // Load your font file
+  const font = new FontLoader().parse(fontJson); // Load the font file
 
   useFrame(() => {
     if (textRef.current) {
