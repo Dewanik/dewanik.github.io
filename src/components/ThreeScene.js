@@ -24,11 +24,19 @@ const RotatingText = () => {
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle"
-    >
-      Yantra Inc, </br>
-Software Company of  Birtamod, Jhapa
+      anchorY="middle">
+      Yantra Inc, 
     </Text>
+  <Text
+      ref={textRef}
+      fontSize={1}
+      color="white"
+      position={[0, 0, 0]}
+      anchorX="center"
+      anchorY="middle">
+Software Company of Birtamode, Jhapa
+        </Text>
+        
   );
 };
 
