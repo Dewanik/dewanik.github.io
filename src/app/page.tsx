@@ -2,7 +2,7 @@
 "use client";
 
 import Head from 'next/head';
-import ThreeScene from './components/ThreeScene';
+import ThreeScene from '../components/ThreeScene'; // Updated path
 
 export default function Home() {
   return (
