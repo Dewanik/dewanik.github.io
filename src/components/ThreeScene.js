@@ -55,12 +55,10 @@ const GlowingText = ({ children, position }) => {
   );
 };
 
-const RotatingText = () => {
+const RotatingText = ({ onRotate }) => {
   const textRef = useRef();
-  const { mouse } = useThree();
   const [fontSize, setFontSize] = useState(1);
   const [rotationMultiplier, setRotationMultiplier] = useState(2);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Adjust font size based on window width
   useEffect(() => {
@@ -83,9 +81,8 @@ const RotatingText = () => {
   }, []);
 
   useFrame(() => {
-    if (textRef.current && isHovered) {
-      textRef.current.rotation.y = mouse.x * rotationMultiplier;
-      textRef.current.rotation.x = -mouse.y * rotationMultiplier;
+    if (textRef.current && onRotate) {
+      textRef.current.rotation.y += 0.01;
     }
   });
 
@@ -95,9 +92,7 @@ const RotatingText = () => {
       fontSize={fontSize}
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle"
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}>
+      anchorY="middle">
       Yantra Inc,{"\n"}
       Software company of{"\n"}
       Birtamode, Jhapa
@@ -105,21 +100,7 @@ const RotatingText = () => {
   );
 };
 
-const InteractiveText = ({ position, children, link }) => {
-  const textRef = useRef();
-  const { mouse } = useThree();
-  const [visible, setVisible] = useState(false);
-
-  useFrame(() => {
-    if (textRef.current) {
-      const distance = Math.hypot(
-        textRef.current.position.x - mouse.x * 10,
-        textRef.current.position.y + mouse.y * 10
-      );
-      setVisible(distance < 1.5); // Adjust the radius of the torch effect
-    }
-  });
-
+const InteractiveText = ({ position, children, link, visible }) => {
   return (
     <group>
       {visible && (
@@ -130,7 +111,6 @@ const InteractiveText = ({ position, children, link }) => {
         </Html>
       )}
       <Text
-        ref={textRef}
         fontSize={1}
         color={visible ? "white" : "black"} // Hide text if not visible
         position={position}
@@ -166,16 +146,41 @@ const TorchEffect = () => {
 };
 
 const ThreeScene = () => {
+  const [rotateText, setRotateText] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const { mouse } = useThree();
+
+  useFrame(() => {
+    const distance = Math.hypot(mouse.x * 10 - 5, mouse.y * 10 + 5);
+    setIsVisible(distance < 2); // Adjust the radius of the torch effect
+  });
+
   return (
-    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <TorchEffect />
-      <RotatingText />
-      <InteractiveText position={[-3, 3, 0]} link="#about">About</InteractiveText>
-      <InteractiveText position={[3, 3, 0]} link="#contact">Contact</InteractiveText>
-      <InteractiveText position={[0, -3, 0]} link="#privacy">Privacy Policy</InteractiveText>
-    </Canvas>
+    <>
+      <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        <TorchEffect />
+        <RotatingText onRotate={rotateText} />
+        <InteractiveText position={[4, 4, 0]} link="#about" visible={isVisible}>About</InteractiveText>
+        <InteractiveText position={[4, 3, 0]} link="#contact" visible={isVisible}>Contact</InteractiveText>
+        <InteractiveText position={[4, 2, 0]} link="#privacy" visible={isVisible}>Privacy Policy</InteractiveText>
+      </Canvas>
+      <button
+        onClick={() => setRotateText(!rotateText)}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          padding: '10px',
+          background: 'white',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        Rotate Text
+      </button>
+    </>
   );
 };
 
