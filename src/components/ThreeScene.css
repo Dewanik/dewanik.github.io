@@ -21,16 +21,6 @@
   }
 }
 
-.links-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: opacity 0.3s ease-in-out;
-}
-
 .link {
   color: white;
   font-size: 20px;
