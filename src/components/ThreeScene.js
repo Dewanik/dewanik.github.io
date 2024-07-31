@@ -105,39 +105,42 @@ const InteractiveLinks = ({ visible }) => {
   );
 };
 
-const TorchEffect = ({ setVisible }) => {
-  const torchRef = useRef();
-  const { mouse, size } = useThree();
-
-  useFrame(() => {
-    if (torchRef.current) {
-      const x = (mouse.x * size.width) / 2 + size.width / 2;
-      const y = (mouse.y * size.height) / 2 + size.height / 2;
-      torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
-
-      const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
-      const contactDistance = Math.hypot(x - size.width + 60, y - 110);
-      const privacyDistance = Math.hypot(x - size.width + 60, y - 160);
-
-      setVisible({
-        about: aboutDistance < 150,
-        contact: contactDistance < 150,
-        privacy: privacyDistance < 150
-      });
-    }
-  });
-
+const TorchEffect = ({ torchPosition }) => {
   return (
     <Html>
-      <div ref={torchRef} className="torch"></div>
+      <div
+        className="torch"
+        style={{
+          left: torchPosition.x,
+          top: torchPosition.y,
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
     </Html>
   );
 };
 
-const Scene = ({ rotateText, setVisible, visible }) => {
+const Scene = ({ rotateText, torchPosition, setVisible, visible }) => {
+  const { size } = useThree();
+
+  useFrame(() => {
+    const x = torchPosition.x;
+    const y = torchPosition.y;
+
+    const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
+    const contactDistance = Math.hypot(x - size.width + 60, y - 110);
+    const privacyDistance = Math.hypot(x - size.width + 60, y - 160);
+
+    setVisible({
+      about: aboutDistance < 150,
+      contact: contactDistance < 150,
+      privacy: privacyDistance < 150,
+    });
+  });
+
   return (
     <>
-      <TorchEffect setVisible={setVisible} />
+      <TorchEffect torchPosition={torchPosition} />
       <RotatingText rotate={rotateText} />
       <InteractiveLinks visible={visible} />
       <ambientLight intensity={0.5} />
@@ -149,11 +152,23 @@ const Scene = ({ rotateText, setVisible, visible }) => {
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
   const [visible, setVisible] = useState({ about: false, contact: false, privacy: false });
+  const [torchPosition, setTorchPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      setTorchPosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   return (
     <>
       <Canvas style={{ width: '100%', height: '100vh', background: '#000000', cursor: 'none' }}>
-        <Scene rotateText={rotateText} setVisible={setVisible} visible={visible} />
+        <Scene rotateText={rotateText} torchPosition={torchPosition} setVisible={setVisible} visible={visible} />
       </Canvas>
       <button
         onClick={() => setRotateText(!rotateText)}
