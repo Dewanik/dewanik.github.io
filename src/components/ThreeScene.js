@@ -10,7 +10,7 @@ import './ThreeScene.css'; // Import the CSS file for styling
 
 const RotatingText = () => {
   const textRef = useRef();
-  const font = new FontLoader().parse(require('./path-to-your-font.json')); // Load your font file
+  const font = new FontLoader().parse(require('./helvetiker_regular.typeface.json')); // Load your font file
 
   useFrame(() => {
     if (textRef.current) {
