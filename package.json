@@ -10,6 +10,8 @@
     "deploy": "npm run build && git add . && git commit -m 'Deploy to GitHub Pages' && git push"
   },
   "dependencies": {
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.16.8",
     "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
