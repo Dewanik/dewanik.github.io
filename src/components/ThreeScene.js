@@ -4,12 +4,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html } from '@react-three/drei';
+import { Vector3 } from 'three';
 
 const RotatingText = () => {
   const textRef = useRef();
   const { mouse } = useThree();
   const [fontSize, setFontSize] = useState(1);
   const [rotationMultiplier, setRotationMultiplier] = useState(2);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Adjust font size based on window width
   useEffect(() => {
@@ -32,7 +34,7 @@ const RotatingText = () => {
   }, []);
 
   useFrame(() => {
-    if (textRef.current) {
+    if (textRef.current && isHovered) {
       textRef.current.rotation.y = mouse.x * rotationMultiplier;
       textRef.current.rotation.x = -mouse.y * rotationMultiplier;
     }
@@ -45,7 +47,9 @@ const RotatingText = () => {
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle">
+      anchorY="middle"
+      onPointerOver={() => setIsHovered(true)}
+      onPointerOut={() => setIsHovered(false)}>
       Yantra Inc,{"\n"}
       Software company of{"\n"}
       Birtamode, Jhapa
