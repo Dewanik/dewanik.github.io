@@ -86,17 +86,17 @@ const RotatingText = ({ rotate }) => {
 const InteractiveLinks = ({ visible }) => {
   return (
     <>
-      <Html position={[4, 3.5, 0]}>
+      <Html position={[3, 3.5, 0]}>
         <div style={{ opacity: visible.about ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
           <a href="#about" className="link">About</a>
         </div>
       </Html>
-      <Html position={[4, 2.5, 0]}>
+      <Html position={[3, 2.5, 0]}>
         <div style={{ opacity: visible.contact ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
           <a href="#contact" className="link">Contact</a>
         </div>
       </Html>
-      <Html position={[4, 1.5, 0]}>
+      <Html position={[3, 1.5, 0]}>
         <div style={{ opacity: visible.privacy ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>
           <a href="#privacy" className="link">Privacy Policy</a>
         </div>
@@ -115,9 +115,9 @@ const TorchEffect = ({ setVisible }) => {
       const y = (mouse.y * size.height) / 2;
       torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
 
-      const aboutDistance = Math.hypot(x - size.width + 100, y - 50);
-      const contactDistance = Math.hypot(x - size.width + 100, y - 100);
-      const privacyDistance = Math.hypot(x - size.width + 100, y - 150);
+      const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
+      const contactDistance = Math.hypot(x - size.width + 60, y - 110);
+      const privacyDistance = Math.hypot(x - size.width + 60, y - 160);
 
       setVisible({
         about: aboutDistance < 150,
@@ -127,7 +127,7 @@ const TorchEffect = ({ setVisible }) => {
     }
   });
 
-  return <div ref={torchRef} className="torch"></div>;
+  return <Html><div ref={torchRef} className="torch"></div></Html>;
 };
 
 const Scene = ({ rotateText, setVisible, visible }) => {
