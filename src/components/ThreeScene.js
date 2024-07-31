@@ -107,27 +107,35 @@ const InteractiveLinks = ({ visible }) => {
 
 const TorchEffect = ({ setVisible }) => {
   const torchRef = useRef();
-  const { mouse, size } = useThree();
+  const { size } = useThree();
 
-  useFrame(() => {
-    if (torchRef.current) {
-      const x = (mouse.x * size.width) / 2 + size.width / 2;
-      const y = (mouse.y * size.height) / 2 + size.height / 2;
-      torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      const x = event.clientX;
+      const y = event.clientY;
 
-      const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
-      const contactDistance = Math.hypot(x - size.width + 60, y - 110);
-      const privacyDistance = Math.hypot(x - size.width + 60, y - 160);
+      if (torchRef.current) {
+        torchRef.current.style.transform = `translate(${x}px, ${y}px)`;
 
-      setVisible({
-        about: aboutDistance < 150,
-        contact: contactDistance < 150,
-        privacy: privacyDistance < 150
-      });
-    }
-  });
+        const aboutDistance = Math.hypot(x - size.width + 60, y - 60);
+        const contactDistance = Math.hypot(x - size.width + 60, y - 110);
+        const privacyDistance = Math.hypot(x - size.width + 60, y - 160);
 
-  return <Html><div ref={torchRef} className="torch"></div></Html>;
+        setVisible({
+          about: aboutDistance < 150,
+          contact: contactDistance < 150,
+          privacy: privacyDistance < 150
+        });
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [size, setVisible]);
+
+  return <div ref={torchRef} className="torch"></div>;
 };
 
 const Scene = ({ rotateText, setVisible, visible }) => {
