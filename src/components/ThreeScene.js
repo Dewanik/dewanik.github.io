@@ -5,6 +5,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import './ThreeScene.css'; // Import the CSS file for styling
 
 const GlowingText = ({ children, position, fontSize }) => {
   const textRef = useRef();
@@ -143,10 +144,25 @@ const Scene = ({ rotateText, setVisible }) => {
 const ThreeScene = () => {
   const [rotateText, setRotateText] = useState(false);
   const [visible, setVisible] = useState(false);
+  const torchRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      if (torchRef.current) {
+        torchRef.current.style.left = `${event.clientX}px`;
+        torchRef.current.style.top = `${event.clientY}px`;
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   return (
     <>
-      <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
+      <Canvas style={{ width: '100%', height: '100vh', background: '#000000', cursor: 'none' }}>
         <Scene rotateText={rotateText} setVisible={setVisible} />
       </Canvas>
       <button
@@ -163,6 +179,7 @@ const ThreeScene = () => {
       >
         Rotate Text
       </button>
+      <div ref={torchRef} className="torch"></div>
     </>
   );
 };
