@@ -8,7 +8,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import * as THREE from 'three';
 import './ThreeScene.css'; // Import the CSS file for styling
 
-const fontJson = require('../fonts/helvetiker_regular.typeface.json'); // Adjust the path according to your project structure
+const fontJson = require('./helvetiker_regular.typeface.json'); // Adjust the path according to your project structure
 
 const RotatingText = () => {
   const textRef = useRef();
