@@ -4,7 +4,56 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html } from '@react-three/drei';
-import { Vector3 } from 'three';
+import { Vector3, Color } from 'three';
+
+const GlowingText = ({ children, position }) => {
+  const textRef = useRef();
+
+  useEffect(() => {
+    if (textRef.current) {
+      textRef.current.material = new THREE.ShaderMaterial({
+        uniforms: {
+          glowColor: { type: 'c', value: new Color('white') },
+          viewVector: { type: 'v3', value: new Vector3(0, 0, 100) },
+        },
+        vertexShader: `
+          uniform vec3 viewVector;
+          varying float intensity;
+          void main() {
+            vec3 vNormal = normalize(normalMatrix * normal);
+            vec3 vNormel = normalize(normalMatrix * viewVector);
+            intensity = pow(0.8 - dot(vNormal, vNormel), 6.0);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 glowColor;
+          varying float intensity;
+          void main() {
+            vec4 color = vec4(glowColor, 1.0);
+            color.a = intensity;
+            gl_FragColor = color;
+          }
+        `,
+        side: THREE.FrontSide,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+      });
+    }
+  }, []);
+
+  return (
+    <Text
+      ref={textRef}
+      fontSize={1}
+      color="white"
+      position={position}
+      anchorX="center"
+      anchorY="middle">
+      {children}
+    </Text>
+  );
+};
 
 const RotatingText = () => {
   const textRef = useRef();
@@ -41,10 +90,9 @@ const RotatingText = () => {
   });
 
   return (
-    <Text
+    <GlowingText
       ref={textRef}
       fontSize={fontSize}
-      color="white"
       position={[0, 0, 0]}
       anchorX="center"
       anchorY="middle"
@@ -53,7 +101,7 @@ const RotatingText = () => {
       Yantra Inc,{"\n"}
       Software company of{"\n"}
       Birtamode, Jhapa
-    </Text>
+    </GlowingText>
   );
 };
 
