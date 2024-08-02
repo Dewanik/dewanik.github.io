@@ -1,12 +1,12 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-const CameraControls = () => {
+const CameraControls = ({ isMousePressed }) => {
   const { camera } = useThree();
   const mouse = useRef({ x: 0, y: 0 });
 
@@ -21,8 +21,10 @@ const CameraControls = () => {
   }, []);
 
   useFrame(() => {
-    camera.rotation.x = mouse.current.y * Math.PI * 0.1;
-    camera.rotation.y = mouse.current.x * Math.PI * 0.1;
+    if (!isMousePressed.current) {
+      camera.rotation.x = mouse.current.y * Math.PI * 0.1;
+      camera.rotation.y = mouse.current.x * Math.PI * 0.1;
+    }
   });
 
   return null;
@@ -62,7 +64,7 @@ const SpotlightWithTarget = () => {
   );
 };
 
-const ClickableBox = ({ position, label, onClick }) => {
+const ClickableBox = ({ position, label, onMouseDown, onMouseUp }) => {
   const boxRef = useRef();
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -72,7 +74,12 @@ const ClickableBox = ({ position, label, onClick }) => {
   });
 
   return (
-    <mesh ref={boxRef} position={position} onPointerDown={onClick}>
+    <mesh
+      ref={boxRef}
+      position={position}
+      onPointerDown={onMouseDown}
+      onPointerUp={onMouseUp}
+    >
       <boxGeometry args={[2, 2, 2]} />
       <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
       <Text
@@ -89,8 +96,14 @@ const ClickableBox = ({ position, label, onClick }) => {
 };
 
 const ThreeScene = () => {
-  const handleBoxClick = (label) => {
-    alert(`Navigating to ${label} page...`);
+  const isMousePressed = useRef(false);
+
+  const handleMouseDown = () => {
+    isMousePressed.current = true;
+  };
+
+  const handleMouseUp = () => {
+    isMousePressed.current = false;
   };
 
   return (
@@ -104,12 +117,32 @@ const ThreeScene = () => {
       <pointLight position={[-10, -10, -10]} intensity={1} color="blue" />
       <pointLight position={[10, -10, 10]} intensity={1} color="red" />
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
-      <CameraControls />
+      <CameraControls isMousePressed={isMousePressed} />
       <SpotlightWithTarget />
-      <ClickableBox position={[-5, 2, 0]} label="About" onClick={() => handleBoxClick('About')} />
-      <ClickableBox position={[0, -2, 0]} label="Contact" onClick={() => handleBoxClick('Contact')} />
-      <ClickableBox position={[5, 2, 0]} label="Projects" onClick={() => handleBoxClick('Projects')} />
-      <ClickableBox position={[10, -2, 0]} label="Policy" onClick={() => handleBoxClick('Policy')} />
+      <ClickableBox
+        position={[-5, 2, 0]}
+        label="About"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+      <ClickableBox
+        position={[0, -2, 0]}
+        label="Contact"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+      <ClickableBox
+        position={[5, 2, 0]}
+        label="Projects"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+      <ClickableBox
+        position={[10, -2, 0]}
+        label="Policy"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
       <Text
         fontSize={0.3}
         color="white"
