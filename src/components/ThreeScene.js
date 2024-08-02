@@ -6,30 +6,24 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-const MainText = () => {
+const RotatingText = () => {
+  const textRef = useRef();
+
+  useFrame(() => {
+    if (textRef.current) {
+      textRef.current.rotation.y += 0.01;
+    }
+  });
+
   return (
     <Text
+      ref={textRef}
       fontSize={1}
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
       anchorY="middle">
-      Yantra Inc,{"\n"}
-      Software company of{"\n"}
-      Birtamode, Jhapa
-    </Text>
-  );
-};
-
-const MovingText = ({ position, text }) => {
-  return (
-    <Text
-      fontSize={0.5}
-      color="white"
-      position={position}
-      anchorX="center"
-      anchorY="middle">
-      {text}
+      Yantra Inc
     </Text>
   );
 };
@@ -56,14 +50,14 @@ const Spotlight = () => {
   useFrame(() => {
     // Move the secondary camera with the mouse
     if (secondaryCameraRef.current) {
-      secondaryCameraRef.current.position.x = mouse.x * 10;
-      secondaryCameraRef.current.position.y = mouse.y * 10;
-      secondaryCameraRef.current.lookAt(new THREE.Vector3(0, 0, 0)); // Ensure the camera looks at the center
+      secondaryCameraRef.current.position.x = mouse.x * 20;
+      secondaryCameraRef.current.position.y = mouse.y * 20;
+      secondaryCameraRef.current.lookAt(0, 0, 0); // Ensure the camera looks at the center
 
       // Move spotlight target with the mouse
       if (spotlightRef.current) {
-        spotlightRef.current.target.position.x = mouse.x * 10;
-        spotlightRef.current.target.position.y = mouse.y * 10;
+        spotlightRef.current.target.position.x = mouse.x * 20;
+        spotlightRef.current.target.position.y = mouse.y * 20;
       }
 
       // Render secondary camera view
@@ -83,35 +77,16 @@ const Spotlight = () => {
     }
   });
 
-  return <perspectiveCamera ref={secondaryCameraRef} fov={10} aspect={1} position={[0, 0, 10]} />;
+  return <perspectiveCamera ref={secondaryCameraRef} fov={10} aspect={size.width / size.height} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
-  const targetPositions = [
-    [5, 5, 0], // About
-    [-5, 5, 0], // Contact
-    [0, -5, 0], // Privacy Policy
-    [5, -5, 0], // Home
-    [-5, -5, 0], // Services
-  ];
-
-  const targetTexts = [
-    "About",
-    "Contact",
-    "Privacy Policy",
-    "Home",
-    "Services"
-  ];
-
   return (
     <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <MainText />
+      <RotatingText />
       <Spotlight />
-      {targetTexts.map((text, index) => (
-        <MovingText key={index} position={targetPositions[index]} text={text} />
-      ))}
     </Canvas>
   );
 };
