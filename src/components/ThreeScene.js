@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -51,54 +51,44 @@ const Background = () => {
   );
 };
 
-const SecondaryCamera = () => {
+const CircularViewport = () => {
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
 
   useFrame(() => {
     if (secondaryCameraRef.current) {
+      // Move the secondary camera with the mouse
       secondaryCameraRef.current.position.x = mouse.x * 10;
       secondaryCameraRef.current.position.y = mouse.y * 10;
       secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0));
 
+      // Render secondary camera view in a circular viewport
       gl.autoClear = false;
       gl.clearDepth();
-      const viewportWidth = 200;
-      const viewportHeight = 200;
-      const viewportX = size.width - viewportWidth - 20;
-      const viewportY = size.height - viewportHeight - 20;
 
-      // Use stencil buffer to create a circular viewport
-      gl.enable(gl.STENCIL_TEST);
-      gl.clearStencil(0);
-      gl.stencilFunc(gl.ALWAYS, 1, 0xff);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-      gl.colorMask(false, false, false, false);
-      gl.depthMask(false);
-      gl.clear(gl.STENCIL_BUFFER_BIT);
+      const viewportSize = 200;
+      const viewportX = size.width - viewportSize - 20; // Fixed position in bottom right corner
+      const viewportY = size.height - viewportSize - 20;
 
-      gl.beginPath();
-      gl.arc(viewportX + viewportWidth / 2, viewportY + viewportHeight / 2, viewportWidth / 2, 0, Math.PI * 2);
-      gl.closePath();
-      gl.fill();
-
-      gl.colorMask(true, true, true, true);
-      gl.depthMask(true);
-      gl.stencilFunc(gl.EQUAL, 1, 0xff);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = viewportSize;
+      maskCanvas.height = viewportSize;
+      const maskContext = maskCanvas.getContext('2d');
+      maskContext.beginPath();
+      maskContext.arc(viewportSize / 2, viewportSize / 2, viewportSize / 2, 0, Math.PI * 2);
+      maskContext.closePath();
+      maskContext.fill();
 
       gl.setScissorTest(true);
-      gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
-      gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+      gl.setScissor(viewportX, viewportY, viewportSize, viewportSize);
+      gl.setViewport(viewportX, viewportY, viewportSize, viewportSize);
       gl.render(scene, secondaryCameraRef.current);
       gl.setScissorTest(false);
-
-      gl.disable(gl.STENCIL_TEST);
       gl.autoClear = true;
     }
   });
 
-  return <perspectiveCamera ref={secondaryCameraRef} fov={20} aspect={1} position={[0, 0, 10]} />;
+  return <perspectiveCamera ref={secondaryCameraRef} fov={10} aspect={1} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
@@ -108,7 +98,7 @@ const ThreeScene = () => {
       <pointLight position={[10, 10, 10]} />
       <Background />
       <RotatingText />
-      <SecondaryCamera />
+      <CircularViewport />
     </Canvas>
   );
 };
