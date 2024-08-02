@@ -34,31 +34,37 @@ const MovingText = ({ position, text }) => {
   );
 };
 
-const Spotlight = ({ targetPositions, targetTexts }) => {
+const Spotlight = () => {
   const spotlightRef = useRef();
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
 
   useEffect(() => {
-    if (spotlightRef.current) {
-      const spotlight = spotlightRef.current;
-      const spotlightTarget = new THREE.Object3D();
-      scene.add(spotlightTarget);
-      spotlight.target = spotlightTarget;
-    }
+    const spotlight = new THREE.SpotLight(0xffffff, 1);
+    spotlight.position.set(0, 0, 10);
+    spotlight.angle = 0.3;
+    spotlight.penumbra = 0.5;
+    spotlight.castShadow = true;
+    scene.add(spotlight);
+    spotlightRef.current = spotlight;
+
+    const spotlightTarget = new THREE.Object3D();
+    scene.add(spotlightTarget);
+    spotlight.target = spotlightTarget;
   }, [scene]);
 
   useFrame(() => {
-    if (spotlightRef.current.target) {
-      spotlightRef.current.target.position.x = mouse.x * 10;
-      spotlightRef.current.target.position.y = mouse.y * 10;
-    }
-
     // Move the secondary camera with the mouse
     if (secondaryCameraRef.current) {
       secondaryCameraRef.current.position.x = mouse.x * 10;
       secondaryCameraRef.current.position.y = mouse.y * 10;
-      secondaryCameraRef.current.lookAt(0, 0, 0); // Ensure the camera looks at the center
+      secondaryCameraRef.current.lookAt(new THREE.Vector3(0, 0, 0)); // Ensure the camera looks at the center
+
+      // Move spotlight target with the mouse
+      if (spotlightRef.current) {
+        spotlightRef.current.target.position.x = mouse.x * 10;
+        spotlightRef.current.target.position.y = mouse.y * 10;
+      }
 
       // Render secondary camera view
       gl.autoClear = false;
@@ -77,22 +83,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
     }
   });
 
-  return (
-    <>
-      <spotLight
-        ref={spotlightRef}
-        position={[0, 0, 10]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={1}
-        castShadow
-      />
-      <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={1} position={[0, 0, 10]} /> {/* Small field of view */}
-      {targetTexts.map((text, index) => (
-        <MovingText key={index} position={targetPositions[index]} text={text} />
-      ))}
-    </>
-  );
+  return <perspectiveCamera ref={secondaryCameraRef} fov={10} aspect={1} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
@@ -113,11 +104,15 @@ const ThreeScene = () => {
   ];
 
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100vw', height: '1
+    00vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <MainText />
-      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
+      <Spotlight />
+      {targetTexts.map((text, index) => (
+        <MovingText key={index} position={targetPositions[index]} text={text} />
+      ))}
     </Canvas>
   );
 };
