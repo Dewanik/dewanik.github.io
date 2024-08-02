@@ -3,7 +3,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, MeshWobbleMaterial } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const CameraControls = () => {
@@ -63,13 +63,21 @@ const SpotlightWithTarget = () => {
 };
 
 const ClickableBox = ({ position, label, onClick }) => {
+  const boxRef = useRef();
+  useFrame(({ clock }) => {
+    const time = clock.getElapsedTime();
+    if (boxRef.current) {
+      boxRef.current.position.y = position[1] + Math.sin(time * 2) * 0.1;
+    }
+  });
+
   return (
-    <mesh position={position} onPointerDown={onClick}>
+    <mesh ref={boxRef} position={position} onPointerDown={onClick}>
       <boxGeometry args={[2, 2, 2]} />
       <meshStandardMaterial color="orange" emissive="yellow" emissiveIntensity={1} />
       <Text
         position={[0, 0, 1.1]}
-        fontSize={0.5}
+        fontSize={0.3}
         color="white"
         anchorX="center"
         anchorY="middle"
