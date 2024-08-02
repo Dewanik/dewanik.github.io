@@ -38,15 +38,57 @@ const RandomBox = ({ position }) => {
 };
 
 const ControllerInterface = ({ onDirectionChange }) => {
+  const buttonStyle = {
+    width: '50px',
+    height: '50px',
+    fontSize: '24px',
+    margin: '5px',
+    textAlign: 'center',
+    lineHeight: '50px',
+    cursor: 'pointer',
+  };
+
   return (
     <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1 }}>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <button onMouseDown={() => onDirectionChange('forward', true)} onMouseUp={() => onDirectionChange('forward', false)}>↑</button>
-        <div style={{ display: 'flex' }}>
-          <button onMouseDown={() => onDirectionChange('left', true)} onMouseUp={() => onDirectionChange('left', false)}>←</button>
-          <button onMouseDown={() => onDirectionChange('right', true)} onMouseUp={() => onDirectionChange('right', false)}>→</button>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div
+          style={buttonStyle}
+          onMouseDown={() => onDirectionChange('forward', true)}
+          onMouseUp={() => onDirectionChange('forward', false)}
+          onTouchStart={() => onDirectionChange('forward', true)}
+          onTouchEnd={() => onDirectionChange('forward', false)}
+        >
+          ↑
         </div>
-        <button onMouseDown={() => onDirectionChange('backward', true)} onMouseUp={() => onDirectionChange('backward', false)}>↓</button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('left', true)}
+            onMouseUp={() => onDirectionChange('left', false)}
+            onTouchStart={() => onDirectionChange('left', true)}
+            onTouchEnd={() => onDirectionChange('left', false)}
+          >
+            ←
+          </div>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('right', true)}
+            onMouseUp={() => onDirectionChange('right', false)}
+            onTouchStart={() => onDirectionChange('right', true)}
+            onTouchEnd={() => onDirectionChange('right', false)}
+          >
+            →
+          </div>
+        </div>
+        <div
+          style={buttonStyle}
+          onMouseDown={() => onDirectionChange('backward', true)}
+          onMouseUp={() => onDirectionChange('backward', false)}
+          onTouchStart={() => onDirectionChange('backward', true)}
+          onTouchEnd={() => onDirectionChange('backward', false)}
+        >
+          ↓
+        </div>
       </div>
     </div>
   );
