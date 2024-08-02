@@ -3,7 +3,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Sphere } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const RotatingText = () => {
@@ -49,11 +49,10 @@ const RotatingText = () => {
   );
 };
 
-const Spotlight = ({ targetPositions }) => {
+const Spotlight = ({ targetPositions, targetTexts }) => {
   const spotlightRef = useRef();
   const spotlightTargetRef = useRef(new THREE.Object3D());
   const { scene, gl, size, mouse } = useThree();
-  const [currentTarget, setCurrentTarget] = useState(0);
   const cameraRef = useRef();
 
   useEffect(() => {
@@ -66,20 +65,11 @@ const Spotlight = ({ targetPositions }) => {
   }, [scene]);
 
   useFrame(() => {
-    const spotlightTarget = spotlightTargetRef.current;
-    if (spotlightTarget) {
-      const targetPosition = targetPositions[currentTarget];
-      spotlightTarget.position.lerp(
-        new THREE.Vector3(...targetPosition),
-        0.05
-      );
-    }
-
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-      cameraRef.current.lookAt(spotlightTarget.position);
+      cameraRef.current.lookAt(spotlightTargetRef.current.position);
 
       // Render secondary camera view
       gl.autoClear = false;
@@ -100,7 +90,7 @@ const Spotlight = ({ targetPositions }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTarget((prevTarget) => (prevTarget + 1) % targetPositions.length);
+      spotlightTargetRef.current.position.set(...targetPositions[Math.floor(Math.random() * targetPositions.length)]);
     }, 2000); // Change target every 2 seconds
 
     return () => clearInterval(interval);
@@ -116,10 +106,18 @@ const Spotlight = ({ targetPositions }) => {
         intensity={1}
         castShadow
       />
-      <Sphere ref={spotlightTargetRef} args={[0.1, 32, 32]} position={[0, 0, 0]}>
-        <meshBasicMaterial attach="material" color="red" />
-      </Sphere>
       <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
+      {targetTexts.map((text, index) => (
+        <Text
+          key={index}
+          fontSize={0.5}
+          color="white"
+          position={targetPositions[index]}
+          anchorX="center"
+          anchorY="middle">
+          {text}
+        </Text>
+      ))}
     </>
   );
 };
@@ -132,11 +130,17 @@ const ThreeScene = () => {
     [0, -2, 0], // Privacy Policy
   ];
 
+  const targetTexts = [
+    "About",
+    "Contact",
+    "Privacy Policy",
+  ];
+
   return (
     <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Spotlight targetPositions={targetPositions} />
+      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
       <RotatingText />
     </Canvas>
   );
