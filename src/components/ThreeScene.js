@@ -30,22 +30,9 @@ const RotatingText = () => {
   );
 };
 
-const FlashlightEffect = () => {
+const SecondaryCamera = () => {
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
-
-  useEffect(() => {
-    const spotlight = new THREE.SpotLight(0xffffff, 1);
-    spotlight.position.set(0, 0, 10);
-    spotlight.angle = 0.3;
-    spotlight.penumbra = 0.5;
-    spotlight.castShadow = true;
-    scene.add(spotlight);
-
-    const spotlightTarget = new THREE.Object3D();
-    scene.add(spotlightTarget);
-    spotlight.target = spotlightTarget;
-  }, [scene]);
 
   useFrame(() => {
     // Move the secondary camera with the mouse
@@ -60,7 +47,7 @@ const FlashlightEffect = () => {
       const viewportWidth = 200; // Smaller viewport width
       const viewportHeight = 200; // Smaller viewport height
       const viewportX = size.width - viewportWidth - 20; // Fixed position in bottom right corner
-      const viewportY = 20;
+      const viewportY = size.height - viewportHeight - 20;
 
       gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
@@ -80,7 +67,7 @@ const ThreeScene = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <RotatingText />
-      <FlashlightEffect />
+      <SecondaryCamera />
     </Canvas>
   );
 };
