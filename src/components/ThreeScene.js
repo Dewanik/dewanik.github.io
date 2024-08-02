@@ -29,7 +29,6 @@ const RotatingText = () => {
 };
 
 const FlashlightEffect = () => {
-  const spotlightRef = useRef();
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
 
@@ -40,7 +39,6 @@ const FlashlightEffect = () => {
     spotlight.penumbra = 0.5;
     spotlight.castShadow = true;
     scene.add(spotlight);
-    spotlightRef.current = spotlight;
 
     const spotlightTarget = new THREE.Object3D();
     scene.add(spotlightTarget);
@@ -53,12 +51,6 @@ const FlashlightEffect = () => {
       secondaryCameraRef.current.position.x = mouse.x * 10;
       secondaryCameraRef.current.position.y = mouse.y * 10;
       secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0)); // Ensure the camera looks at the mouse position
-
-      // Move spotlight target with the mouse
-      if (spotlightRef.current) {
-        spotlightRef.current.target.position.x = mouse.x * 10;
-        spotlightRef.current.target.position.y = mouse.y * 10;
-      }
 
       // Render secondary camera view
       gl.autoClear = false;
