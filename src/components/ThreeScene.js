@@ -37,7 +37,7 @@ const MovingText = ({ position, text }) => {
 const Spotlight = ({ targetPositions, targetTexts }) => {
   const spotlightRef = useRef();
   const { scene, gl, size, mouse } = useThree();
-  const cameraRef = useRef();
+  const secondaryCameraRef = useRef();
 
   useEffect(() => {
     if (spotlightRef.current) {
@@ -49,11 +49,16 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
   }, [scene]);
 
   useFrame(() => {
+    if (spotlightRef.current.target) {
+      spotlightRef.current.target.position.x = mouse.x * 10;
+      spotlightRef.current.target.position.y = mouse.y * 10;
+    }
+
     // Move the secondary camera with the mouse
-    if (cameraRef.current) {
-      cameraRef.current.position.x = mouse.x * 10;
-      cameraRef.current.position.y = mouse.y * 10;
-      cameraRef.current.lookAt(0, 0, 0); // Make the camera look at the center
+    if (secondaryCameraRef.current) {
+      secondaryCameraRef.current.position.x = mouse.x * 10;
+      secondaryCameraRef.current.position.y = mouse.y * 10;
+      secondaryCameraRef.current.lookAt(0, 0, 0); // Ensure the camera looks at the center
 
       // Render secondary camera view
       gl.autoClear = false;
@@ -66,7 +71,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
       gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
       gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
-      gl.render(scene, cameraRef.current);
+      gl.render(scene, secondaryCameraRef.current);
       gl.setScissorTest(false);
       gl.autoClear = true;
     }
@@ -82,7 +87,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
         intensity={1}
         castShadow
       />
-      <perspectiveCamera ref={cameraRef} fov={10} aspect={1} position={[0, 0, 10]} /> {/* Small field of view */}
+      <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={1} position={[0, 0, 10]} /> {/* Small field of view */}
       {targetTexts.map((text, index) => (
         <MovingText key={index} position={targetPositions[index]} text={text} />
       ))}
