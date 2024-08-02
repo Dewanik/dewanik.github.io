@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -56,30 +56,49 @@ const SecondaryCamera = () => {
   const secondaryCameraRef = useRef();
 
   useFrame(() => {
-    // Move the secondary camera with the mouse
     if (secondaryCameraRef.current) {
       secondaryCameraRef.current.position.x = mouse.x * 10;
       secondaryCameraRef.current.position.y = mouse.y * 10;
       secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0));
 
-      // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
       const viewportWidth = 200;
       const viewportHeight = 200;
-      const viewportX = size.width - viewportWidth - 20; // Fixed position in bottom right corner
+      const viewportX = size.width - viewportWidth - 20;
       const viewportY = size.height - viewportHeight - 20;
+
+      // Use stencil buffer to create a circular viewport
+      gl.enable(gl.STENCIL_TEST);
+      gl.clearStencil(0);
+      gl.stencilFunc(gl.ALWAYS, 1, 0xff);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+      gl.colorMask(false, false, false, false);
+      gl.depthMask(false);
+      gl.clear(gl.STENCIL_BUFFER_BIT);
+
+      gl.beginPath();
+      gl.arc(viewportX + viewportWidth / 2, viewportY + viewportHeight / 2, viewportWidth / 2, 0, Math.PI * 2);
+      gl.closePath();
+      gl.fill();
+
+      gl.colorMask(true, true, true, true);
+      gl.depthMask(true);
+      gl.stencilFunc(gl.EQUAL, 1, 0xff);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
 
       gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
       gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
       gl.render(scene, secondaryCameraRef.current);
       gl.setScissorTest(false);
+
+      gl.disable(gl.STENCIL_TEST);
       gl.autoClear = true;
     }
   });
 
-  return <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={size.width / size.height} position={[0, 0, 10]} />;
+  return <perspectiveCamera ref={secondaryCameraRef} fov={20} aspect={1} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
