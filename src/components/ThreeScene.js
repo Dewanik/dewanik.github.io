@@ -49,17 +49,22 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
   }, [scene]);
 
   useFrame(() => {
+    if (spotlightRef.current.target) {
+      spotlightRef.current.target.position.x = mouse.x * 10;
+      spotlightRef.current.target.position.y = mouse.y * 10;
+    }
+
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-      cameraRef.current.lookAt(0, 0, 0); // Make the camera look at the center
+      cameraRef.current.lookAt(spotlightRef.current.target.position);
 
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
-      const viewportWidth = 200;
-      const viewportHeight = 200;
+      const viewportWidth = 150; // Smaller viewport width
+      const viewportHeight = 150; // Smaller viewport height
       const viewportX = (mouse.x + 1) * 0.5 * (size.width - viewportWidth);
       const viewportY = (1 - (mouse.y + 1) * 0.5) * (size.height - viewportHeight);
 
@@ -82,7 +87,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
         intensity={1}
         castShadow
       />
-      <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
+      <perspectiveCamera ref={cameraRef} fov={20} aspect={1} position={[0, 0, 10]} /> {/* Small field of view */}
       {targetTexts.map((text, index) => (
         <MovingText key={index} position={targetPositions[index]} text={text} />
       ))}
