@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { Html } from '@react-three/drei';
 
 const CameraControls = ({ direction }) => {
   const { camera } = useThree();
@@ -105,6 +106,49 @@ const ControllerInterface = ({ onDirectionChange }) => {
   );
 };
 
+const CircularView = () => {
+  const { gl, scene, camera, size } = useThree();
+  const renderTarget = useRef(new THREE.WebGLRenderTarget(size.width, size.height));
+  const shaderMaterial = useRef();
+
+  useEffect(() => {
+    renderTarget.current.setSize(size.width, size.height);
+  }, [size]);
+
+  useFrame(() => {
+    gl.setRenderTarget(renderTarget.current);
+    gl.clear();
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+    shaderMaterial.current.uniforms.tDiffuse.value = renderTarget.current.texture;
+  });
+
+  const fragmentShader = `
+    uniform sampler2D tDiffuse;
+    varying vec2 vUv;
+    void main() {
+      vec2 uv = vUv;
+      vec2 c = vec2(0.5) - uv;
+      float l = length(c) * 2.0;
+      if (l > 0.5) discard;
+      gl_FragColor = texture2D(tDiffuse, uv);
+    }
+  `;
+
+  return (
+    <mesh>
+      <planeBufferGeometry args={[2, 2]} />
+      <shaderMaterial
+        ref={shaderMaterial}
+        uniforms={{ tDiffuse: { value: null } }}
+        vertexShader="varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }"
+        fragmentShader={fragmentShader}
+        transparent
+      />
+    </mesh>
+  );
+};
+
 const ThreeScene = () => {
   const [direction, setDirection] = useState({
     forward: false,
@@ -170,6 +214,7 @@ const ThreeScene = () => {
           Software Company of
           Birtamode, Jhapa, NP
         </Text>
+        <CircularView />
       </Canvas>
       <ControllerInterface onDirectionChange={handleDirectionChange} />
     </>
