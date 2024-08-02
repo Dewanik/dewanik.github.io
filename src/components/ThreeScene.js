@@ -104,8 +104,7 @@ const ThreeScene = () => {
   ];
 
   return (
-    <Canvas style={{ width: '100vw', height: '1
-    00vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <MainText />
