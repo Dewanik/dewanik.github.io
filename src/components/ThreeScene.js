@@ -54,10 +54,10 @@ const RotatingText = () => {
   );
 };
 
-const ThreeScene = () => {
+const Spotlight = () => {
   const spotlightRef = useRef();
   const spotlightTargetRef = useRef(new THREE.Object3D());
-  const { camera, mouse, scene } = useThree();
+  const { mouse, scene } = useThree();
 
   useEffect(() => {
     if (spotlightRef.current) {
@@ -80,17 +80,23 @@ const ThreeScene = () => {
   });
 
   return (
+    <spotLight
+      ref={spotlightRef}
+      position={[0, 0, 10]}
+      angle={0.3}
+      penumbra={0.5}
+      intensity={1}
+      castShadow
+    />
+  );
+};
+
+const ThreeScene = () => {
+  return (
     <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <spotLight
-        ref={spotlightRef}
-        position={[0, 0, 10]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={1}
-        castShadow
-      />
+      <Spotlight />
       <RotatingText />
     </Canvas>
   );
