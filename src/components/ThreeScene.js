@@ -172,7 +172,7 @@ const ThreeScene = () => {
             <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
           ))}
           <Text
-            fontSize={0.3}
+            fontSize={0.1}
             color="white"
             position={[0, 0, 0]}
             anchorX="center"
