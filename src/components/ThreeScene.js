@@ -5,6 +5,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 
 const RotatingText = () => {
   const textRef = useRef();
@@ -55,10 +56,38 @@ const RotatingText = () => {
 };
 
 const ThreeScene = () => {
+  const spotlightRef = useRef();
+  const { camera, mouse, scene } = useThree();
+
+  useEffect(() => {
+    if (spotlightRef.current) {
+      const spotlight = spotlightRef.current;
+      const spotlightTarget = new THREE.Object3D();
+      scene.add(spotlightTarget);
+      spotlight.target = spotlightTarget;
+
+      useFrame(() => {
+        spotlightTarget.position.set(
+          (mouse.x * window.innerWidth) / 2,
+          (mouse.y * window.innerHeight) / 2,
+          0
+        );
+      });
+    }
+  }, [mouse, scene]);
+
   return (
     <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
+      <spotLight
+        ref={spotlightRef}
+        position={[0, 0, 10]}
+        angle={0.3}
+        penumbra={0.5}
+        intensity={1}
+        castShadow
+      />
       <RotatingText />
     </Canvas>
   );
