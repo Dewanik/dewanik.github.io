@@ -5,6 +5,7 @@ import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { useRouter } from 'next/router';
 
 const CameraControls = () => {
   const { camera } = useThree();
@@ -62,30 +63,27 @@ const SpotlightWithTarget = () => {
   );
 };
 
-const RandomBoxes = () => {
-  const groupRef = useRef();
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.005;
-    }
-  });
+const ClickableBox = ({ position, label, href }) => {
+  const router = useRouter();
+
+  const handlePointerDown = () => {
+    router.push(href);
+  };
 
   return (
-    <group ref={groupRef}>
-      {Array.from({ length: 20 }).map((_, i) => (
-        <mesh
-          key={i}
-          position={[
-            (Math.random() - 0.5) * 20,
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 20,
-          ]}
-        >
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color={`hsl(${Math.random() * 360}, 100%, 50%)`} />
-        </mesh>
-      ))}
-    </group>
+    <mesh position={position} onPointerDown={handlePointerDown}>
+      <boxGeometry args={[2, 2, 2]} />
+      <meshStandardMaterial color="orange" />
+      <Text
+        position={[0, 0, 1.1]}
+        fontSize={0.5}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
+    </mesh>
   );
 };
 
@@ -103,11 +101,14 @@ const ThreeScene = () => {
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls />
       <SpotlightWithTarget />
-      <RandomBoxes />
+      <ClickableBox position={[-5, 0, 0]} label="About" href="/about" />
+      <ClickableBox position={[0, 0, 0]} label="Contact" href="/contact" />
+      <ClickableBox position={[5, 0, 0]} label="Projects" href="/projects" />
+      <ClickableBox position={[10, 0, 0]} label="Policy" href="/policy" />
       <Text
-        fontSize={1}
+        fontSize={0.5}
         color="white"
-        position={[0, 0, 0]}
+        position={[0, 3, 0]}
         anchorX="center"
         anchorY="middle"
       >
