@@ -84,9 +84,14 @@ const Spotlight = ({ targetPositions }) => {
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
+      const viewportWidth = 200;
+      const viewportHeight = 200;
+      const viewportX = mouse.x * (size.width - viewportWidth);
+      const viewportY = mouse.y * (size.height - viewportHeight);
+
       gl.setScissorTest(true);
-      gl.setScissor(size.width - 200, size.height - 200, 200, 200);
-      gl.setViewport(size.width - 200, size.height - 200, 200, 200);
+      gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
+      gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
       gl.render(scene, cameraRef.current);
       gl.setScissorTest(false);
       gl.autoClear = true;
@@ -138,4 +143,3 @@ const ThreeScene = () => {
 };
 
 export default ThreeScene;
-
