@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const RotatingText = () => {
@@ -57,24 +56,28 @@ const RotatingText = () => {
 
 const ThreeScene = () => {
   const spotlightRef = useRef();
+  const spotlightTargetRef = useRef(new THREE.Object3D());
   const { camera, mouse, scene } = useThree();
 
   useEffect(() => {
     if (spotlightRef.current) {
       const spotlight = spotlightRef.current;
-      const spotlightTarget = new THREE.Object3D();
+      const spotlightTarget = spotlightTargetRef.current;
       scene.add(spotlightTarget);
       spotlight.target = spotlightTarget;
-
-      useFrame(() => {
-        spotlightTarget.position.set(
-          (mouse.x * window.innerWidth) / 2,
-          (mouse.y * window.innerHeight) / 2,
-          0
-        );
-      });
     }
-  }, [mouse, scene]);
+  }, [scene]);
+
+  useFrame(() => {
+    const spotlightTarget = spotlightTargetRef.current;
+    if (spotlightTarget) {
+      spotlightTarget.position.set(
+        (mouse.x * window.innerWidth) / 2,
+        (mouse.y * window.innerHeight) / 2,
+        0
+      );
+    }
+  });
 
   return (
     <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
