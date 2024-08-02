@@ -49,16 +49,11 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
   }, [scene]);
 
   useFrame(() => {
-    if (spotlightRef.current.target) {
-      spotlightRef.current.target.position.x = mouse.x * 10;
-      spotlightRef.current.target.position.y = mouse.y * 10;
-    }
-
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-   
+      cameraRef.current.lookAt(0, 0, 0); // Make the camera look at the center
 
       // Render secondary camera view
       gl.autoClear = false;
