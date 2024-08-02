@@ -172,14 +172,14 @@ const ThreeScene = () => {
             <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
           ))}
           <Text
-            fontSize={0.5}
+            fontSize={0.3}
             color="white"
             position={[0, 0, 0]}
             anchorX="center"
             anchorY="middle"
           >
-            Yantra Inc,
-            Software Company of
+            Yantra Inc,{'\n'}
+            Software Company of{'\n'}
             Birtamode, Jhapa, NP
           </Text>
         </Canvas>
