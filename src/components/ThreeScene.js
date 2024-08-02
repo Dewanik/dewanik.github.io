@@ -1,7 +1,7 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -35,93 +35,50 @@ const CameraControls = ({ isMousePressed }) => {
   return null;
 };
 
-const SpotlightWithTarget = () => {
-  const spotlightRef = useRef();
-  const spotlightTargetRef = useRef(new THREE.Object3D());
-  const { scene, camera } = useThree();
-
-  useEffect(() => {
-    if (spotlightRef.current) {
-      const spotlight = spotlightRef.current;
-      const spotlightTarget = spotlightTargetRef.current;
-      scene.add(spotlightTarget);
-      spotlight.target = spotlightTarget;
-    }
-  }, [scene]);
-
-  useFrame(() => {
-    if (spotlightTargetRef.current) {
-      spotlightTargetRef.current.position.copy(camera.position);
-    }
-  });
-
-  return (
-    <>
-      <spotLight
-        ref={spotlightRef}
-        position={[0, 0, 0]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={2}
-        castShadow
-      />
-    </>
-  );
-};
-
-const ClickableBox = ({ position, label, onMouseDown, onMouseUp }) => {
-  const boxRef = useRef();
+const LightedText = ({ position, label, onMouseEnter, onMouseLeave }) => {
+  const textRef = useRef();
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
-    if (boxRef.current) {
-      boxRef.current.position.y = position[1] + Math.sin(time * 2) * 0.1;
+    if (textRef.current) {
+      textRef.current.position.y = position[1] + Math.sin(time * 2) * 0.1;
     }
   });
 
   return (
-    <mesh
-      ref={boxRef}
+    <Text
+      ref={textRef}
       position={position}
-      onPointerDown={onMouseDown}
-      onPointerUp={onMouseUp}
+      fontSize={0.5}
+      color="white"
+      anchorX="center"
+      anchorY="middle"
+      onPointerEnter={onMouseEnter}
+      onPointerLeave={onMouseLeave}
     >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
-      {label && (
-        <Text
-          position={[0, 0, 0.6]}
-          fontSize={0.2}
-          color="black"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {label}
-        </Text>
-      )}
-    </mesh>
+      {label}
+    </Text>
   );
 };
 
 const ThreeScene = () => {
   const isMousePressed = useRef(false);
+  const [hoveredText, setHoveredText] = useState(null);
 
-  const handleMouseDown = () => {
+  const handleMouseEnter = (label) => {
+    setHoveredText(label);
     isMousePressed.current = true;
   };
 
-  const handleMouseUp = () => {
+  const handleMouseLeave = () => {
+    setHoveredText(null);
     isMousePressed.current = false;
   };
 
-  const boxPositions = [
-    [-2, 1, 0],
-    [-1, -1, 0],
-    [1, 1, 0],
-    [2, -1, 0],
-    [-3, -1, 0],
-    [3, 2, 0],
-    [-4, 2, 0],
-    [4, -2, 0],
+  const textPositions = [
+    [-3, 1, 0],
+    [3, -1, 0],
+    [-1, -3, 0],
+    [1, 3, 0],
   ];
 
   const labels = [
@@ -129,10 +86,6 @@ const ThreeScene = () => {
     "Contact",
     "Projects",
     "Policy",
-    "",
-    "",
-    "",
-    "",
   ];
 
   return (
@@ -147,14 +100,13 @@ const ThreeScene = () => {
       <pointLight position={[10, -10, 10]} intensity={1} color="red" />
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls isMousePressed={isMousePressed} />
-      <SpotlightWithTarget />
-      {boxPositions.map((position, index) => (
-        <ClickableBox
+      {textPositions.map((position, index) => (
+        <LightedText
           key={index}
           position={position}
           label={labels[index]}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
+          onMouseEnter={() => handleMouseEnter(labels[index])}
+          onMouseLeave={handleMouseLeave}
         />
       ))}
       <Text
