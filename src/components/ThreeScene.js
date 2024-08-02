@@ -52,8 +52,9 @@ const RotatingText = () => {
 const Spotlight = ({ targetPositions }) => {
   const spotlightRef = useRef();
   const spotlightTargetRef = useRef(new THREE.Object3D());
-  const { scene } = useThree();
+  const { scene, gl, size } = useThree();
   const [currentTarget, setCurrentTarget] = useState(0);
+  const cameraRef = useRef();
 
   useEffect(() => {
     if (spotlightRef.current) {
@@ -72,6 +73,18 @@ const Spotlight = ({ targetPositions }) => {
         new THREE.Vector3(...targetPosition),
         0.05
       );
+    }
+
+    // Render secondary camera view
+    if (cameraRef.current) {
+      gl.autoClear = false;
+      gl.clearDepth();
+      gl.setScissorTest(true);
+      gl.setScissor(size.width - 200, size.height - 200, 200, 200);
+      gl.setViewport(size.width - 200, size.height - 200, 200, 200);
+      gl.render(scene, cameraRef.current);
+      gl.setScissorTest(false);
+      gl.autoClear = true;
     }
   });
 
@@ -96,6 +109,7 @@ const Spotlight = ({ targetPositions }) => {
       <Sphere ref={spotlightTargetRef} args={[0.1, 32, 32]} position={[0, 0, 0]}>
         <meshBasicMaterial attach="material" color="red" />
       </Sphere>
+      <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
     </>
   );
 };
