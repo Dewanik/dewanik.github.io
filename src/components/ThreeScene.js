@@ -18,7 +18,7 @@ const RotatingText = () => {
   return (
     <Text
       ref={textRef}
-      fontSize={1}
+      fontSize={3}
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
@@ -28,7 +28,7 @@ const RotatingText = () => {
   );
 };
 
-const Spotlight = () => {
+const FlashlightEffect = () => {
   const spotlightRef = useRef();
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
@@ -50,14 +50,14 @@ const Spotlight = () => {
   useFrame(() => {
     // Move the secondary camera with the mouse
     if (secondaryCameraRef.current) {
-      secondaryCameraRef.current.position.x = mouse.x * 20;
-      secondaryCameraRef.current.position.y = mouse.y * 20;
-      secondaryCameraRef.current.lookAt(0, 0, 0); // Ensure the camera looks at the center
+      secondaryCameraRef.current.position.x = mouse.x * 10;
+      secondaryCameraRef.current.position.y = mouse.y * 10;
+      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0)); // Ensure the camera looks at the mouse position
 
       // Move spotlight target with the mouse
       if (spotlightRef.current) {
-        spotlightRef.current.target.position.x = mouse.x * 20;
-        spotlightRef.current.target.position.y = mouse.y * 20;
+        spotlightRef.current.target.position.x = mouse.x * 10;
+        spotlightRef.current.target.position.y = mouse.y * 10;
       }
 
       // Render secondary camera view
@@ -77,7 +77,7 @@ const Spotlight = () => {
     }
   });
 
-  return <perspectiveCamera ref={secondaryCameraRef} fov={10} aspect={size.width / size.height} position={[0, 0, 10]} />;
+  return <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={1} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
@@ -86,7 +86,7 @@ const ThreeScene = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <RotatingText />
-      <Spotlight />
+      <FlashlightEffect />
     </Canvas>
   );
 };
