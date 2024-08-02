@@ -1,7 +1,7 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -49,22 +49,23 @@ const Spotlight = () => {
   }, [scene]);
 
   useFrame(() => {
+    if (spotlightRef.current.target) {
+      spotlightRef.current.target.position.x = mouse.x * 10;
+      spotlightRef.current.target.position.y = mouse.y * 10;
+    }
+
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-
-      // Update spotlight target position
-      const spotlightTarget = spotlightRef.current.target;
-      spotlightTarget.position.set(mouse.x * 10, mouse.y * 10, 0);
 
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
       const viewportWidth = 200;
       const viewportHeight = 200;
-      const viewportX = mouse.x * (size.width - viewportWidth);
-      const viewportY = mouse.y * (size.height - viewportHeight);
+      const viewportX = (mouse.x + 1) * 0.5 * (size.width - viewportWidth);
+      const viewportY = (1 - (mouse.y + 1) * 0.5) * (size.height - viewportHeight);
 
       gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
@@ -109,7 +110,7 @@ const ThreeScene = () => {
 
   return (
     <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
-      <ambientLight intensity={0.1} />
+      <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <MainText />
       <Spotlight />
