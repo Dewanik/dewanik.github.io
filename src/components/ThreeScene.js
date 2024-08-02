@@ -190,7 +190,7 @@ const ThreeScene = () => {
         justifyContent: 'center',
         boxShadow: '0 0 15px 15px rgba(255, 255, 255, 0.5)',
       }}>
-        <Canvas style={{ borderRadius: '50%' }} camera={{ position: [0, 1, 5], fov: 10 }}>
+        <Canvas style={{ borderRadius: '50%' }} camera={{ position: [0, 1, 15], fov: 10 }}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
           <pointLight position={[-10, -10, -10]} intensity={1} color="blue" />
@@ -202,7 +202,7 @@ const ThreeScene = () => {
             <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
           ))}
           <Text
-            fontSize={0.3}
+            fontSize={0.2}
             color="white"
             position={[0, 0, 0]}
             anchorX="center"
