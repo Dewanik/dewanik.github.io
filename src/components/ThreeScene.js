@@ -1,8 +1,8 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import React, { useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -18,58 +18,16 @@ const RotatingText = () => {
   return (
     <Text
       ref={textRef}
-      fontSize={3}
+      fontSize={1}
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
-      anchorY="middle">
-      Yantra Inc
+      anchorY="middle"
+      maxWidth={10}
+      textAlign="center">
+      {"Yantra Inc,\nSoftware Company of\nBirtamode, Jhapa, NP"}
     </Text>
   );
-};
-
-const FlashlightEffect = () => {
-  const { scene, gl, size, mouse } = useThree();
-  const secondaryCameraRef = useRef();
-
-  useEffect(() => {
-    const spotlight = new THREE.SpotLight(0xffffff, 1);
-    spotlight.position.set(0, 0, 10);
-    spotlight.angle = 0.3;
-    spotlight.penumbra = 0.5;
-    spotlight.castShadow = true;
-    scene.add(spotlight);
-
-    const spotlightTarget = new THREE.Object3D();
-    scene.add(spotlightTarget);
-    spotlight.target = spotlightTarget;
-  }, [scene]);
-
-  useFrame(() => {
-    // Move the secondary camera with the mouse
-    if (secondaryCameraRef.current) {
-      secondaryCameraRef.current.position.x = mouse.x * 10;
-      secondaryCameraRef.current.position.y = mouse.y * 10;
-      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0)); // Ensure the camera looks at the mouse position
-
-      // Render secondary camera view
-      gl.autoClear = false;
-      gl.clearDepth();
-      const viewportWidth = 150; // Smaller viewport width
-      const viewportHeight = 150; // Smaller viewport height
-      const viewportX = (mouse.x + 1) * 0.5 * (size.width - viewportWidth);
-      const viewportY = (1 - (mouse.y + 1) * 0.5) * (size.height - viewportHeight);
-
-      gl.setScissorTest(true);
-      gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
-      gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
-      gl.render(scene, secondaryCameraRef.current);
-      gl.setScissorTest(false);
-      gl.autoClear = true;
-    }
-  });
-
-  return <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={1} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
@@ -78,7 +36,6 @@ const ThreeScene = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <RotatingText />
-      <FlashlightEffect />
     </Canvas>
   );
 };
