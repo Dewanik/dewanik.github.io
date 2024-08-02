@@ -2,9 +2,12 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Extend to use non-standard Three.js objects
+extend(THREE);
 
 const RotatingText = () => {
   const textRef = useRef();
@@ -48,7 +51,7 @@ const JungleBackground = () => {
   );
 };
 
-const CircularViewport = () => {
+const SecondaryCamera = () => {
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
 
@@ -67,33 +70,33 @@ const CircularViewport = () => {
       const viewportX = size.width - viewportSize - 20; // Fixed position in bottom right corner
       const viewportY = size.height - viewportSize - 20;
 
-      gl.setScissorTest(true);
-      gl.setScissor(viewportX, viewportY, viewportSize, viewportSize);
-      gl.setViewport(viewportX, viewportY, viewportSize, viewportSize);
-      
       // Use stencil buffer to create circular viewport
-      const stencilBuffer = new Uint8Array(viewportSize * viewportSize * 4);
-      gl.readPixels(viewportX, viewportY, viewportSize, viewportSize, gl.RGBA, gl.UNSIGNED_BYTE, stencilBuffer);
-
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-
       gl.enable(gl.STENCIL_TEST);
+      gl.clearStencil(0);
+      gl.clear(gl.STENCIL_BUFFER_BIT);
       gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
       gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+
       gl.colorMask(false, false, false, false);
       gl.depthMask(false);
-      
-      gl.drawPixels(stencilBuffer, viewportSize, viewportSize, viewportX, viewportY);
+
+      const ctx = gl.getContext();
+
+      ctx.beginPath();
+      ctx.arc(viewportX + viewportSize / 2, viewportY + viewportSize / 2, viewportSize / 2, 0, Math.PI * 2);
+      ctx.fill();
 
       gl.colorMask(true, true, true, true);
       gl.depthMask(true);
       gl.stencilFunc(gl.EQUAL, 1, 0xFF);
       gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
 
+      gl.setScissorTest(true);
+      gl.setScissor(viewportX, viewportY, viewportSize, viewportSize);
+      gl.setViewport(viewportX, viewportY, viewportSize, viewportSize);
       gl.render(scene, secondaryCameraRef.current);
-      
-      gl.disable(gl.STENCIL_TEST);
       gl.setScissorTest(false);
+      gl.disable(gl.STENCIL_TEST);
       gl.autoClear = true;
     }
   });
@@ -108,7 +111,7 @@ const ThreeScene = () => {
       <pointLight position={[10, 10, 10]} />
       <JungleBackground />
       <RotatingText />
-      <CircularViewport />
+      <SecondaryCamera />
     </Canvas>
   );
 };
