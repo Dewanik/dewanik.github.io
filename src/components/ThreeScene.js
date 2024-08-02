@@ -9,22 +9,27 @@ import * as THREE from 'three';
 const CameraControls = ({ isMousePressed }) => {
   const { camera } = useThree();
   const mouse = useRef({ x: 0, y: 0 });
+  const targetRotation = useRef({ x: 0, y: 0 });
+  const smoothness = 0.05;
 
   useEffect(() => {
     const handleMouseMove = (event) => {
-      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      if (!isMousePressed.current) {
+        mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isMousePressed]);
 
   useFrame(() => {
-    if (!isMousePressed.current) {
-      camera.rotation.x = mouse.current.y * Math.PI * 0.1;
-      camera.rotation.y = mouse.current.x * Math.PI * 0.1;
-    }
+    targetRotation.current.y = mouse.current.x * Math.PI * 0.1;
+    targetRotation.current.x = mouse.current.y * Math.PI * 0.1;
+
+    camera.rotation.x += (targetRotation.current.x - camera.rotation.x) * smoothness;
+    camera.rotation.y += (targetRotation.current.y - camera.rotation.y) * smoothness;
   });
 
   return null;
