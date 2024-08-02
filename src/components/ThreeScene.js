@@ -34,7 +34,7 @@ const MovingText = ({ position, text }) => {
   );
 };
 
-const Spotlight = () => {
+const Spotlight = ({ targetPositions, targetTexts }) => {
   const spotlightRef = useRef();
   const { scene, gl, size, mouse } = useThree();
   const cameraRef = useRef();
@@ -58,6 +58,7 @@ const Spotlight = () => {
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
+      cameraRef.current.lookAt(spotlightRef.current.target.position);
 
       // Render secondary camera view
       gl.autoClear = false;
@@ -87,6 +88,9 @@ const Spotlight = () => {
         castShadow
       />
       <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
+      {targetTexts.map((text, index) => (
+        <MovingText key={index} position={targetPositions[index]} text={text} />
+      ))}
     </>
   );
 };
@@ -113,10 +117,7 @@ const ThreeScene = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <MainText />
-      <Spotlight />
-      {targetTexts.map((text, index) => (
-        <MovingText key={index} position={targetPositions[index]} text={text} />
-      ))}
+      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
     </Canvas>
   );
 };
