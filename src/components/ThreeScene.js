@@ -51,7 +51,7 @@ const JungleBackground = () => {
   );
 };
 
-const SecondaryCamera = () => {
+const CircularViewport = () => {
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
 
@@ -70,34 +70,25 @@ const SecondaryCamera = () => {
       const viewportX = size.width - viewportSize - 20; // Fixed position in bottom right corner
       const viewportY = size.height - viewportSize - 20;
 
-      // Use stencil buffer to create circular viewport
-      gl.enable(gl.STENCIL_TEST);
-      gl.clearStencil(0);
-      gl.clear(gl.STENCIL_BUFFER_BIT);
-      gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
-
-      gl.colorMask(false, false, false, false);
-      gl.depthMask(false);
-
-      const ctx = gl.getContext();
-
-      ctx.beginPath();
-      ctx.arc(viewportX + viewportSize / 2, viewportY + viewportSize / 2, viewportSize / 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      gl.colorMask(true, true, true, true);
-      gl.depthMask(true);
-      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
-      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-
-      gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportSize, viewportSize);
+      gl.setScissorTest(true);
+
+      const circle = new THREE.Shape();
+      circle.moveTo(viewportSize / 2, 0);
+      circle.absarc(viewportSize / 2, viewportSize / 2, viewportSize / 2, 0, Math.PI * 2, false);
+      const geometry = new THREE.ShapeGeometry(circle);
+      const material = new THREE.MeshBasicMaterial({ colorWrite: false });
+
+      const mask = new THREE.Mesh(geometry, material);
+      scene.add(mask);
+
       gl.setViewport(viewportX, viewportY, viewportSize, viewportSize);
       gl.render(scene, secondaryCameraRef.current);
+
       gl.setScissorTest(false);
-      gl.disable(gl.STENCIL_TEST);
       gl.autoClear = true;
+
+      scene.remove(mask);
     }
   });
 
@@ -111,7 +102,7 @@ const ThreeScene = () => {
       <pointLight position={[10, 10, 10]} />
       <JungleBackground />
       <RotatingText />
-      <SecondaryCamera />
+      <CircularViewport />
     </Canvas>
   );
 };
