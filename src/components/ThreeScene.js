@@ -3,7 +3,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 
 const RotatingText = () => {
@@ -84,14 +84,19 @@ const Spotlight = ({ targetPositions }) => {
   }, [targetPositions]);
 
   return (
-    <spotLight
-      ref={spotlightRef}
-      position={[0, 0, 10]}
-      angle={0.3}
-      penumbra={0.5}
-      intensity={1}
-      castShadow
-    />
+    <>
+      <spotLight
+        ref={spotlightRef}
+        position={[0, 0, 10]}
+        angle={0.3}
+        penumbra={0.5}
+        intensity={1}
+        castShadow
+      />
+      <Sphere ref={spotlightTargetRef} args={[0.1, 32, 32]} position={[0, 0, 0]}>
+        <meshBasicMaterial attach="material" color="red" />
+      </Sphere>
+    </>
   );
 };
 
@@ -104,7 +109,7 @@ const ThreeScene = () => {
   ];
 
   return (
-    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
+    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <Spotlight targetPositions={targetPositions} />
