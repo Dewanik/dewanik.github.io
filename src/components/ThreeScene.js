@@ -74,11 +74,11 @@ const ClickableBox = ({ position, label, onClick }) => {
   return (
     <mesh ref={boxRef} position={position} onPointerDown={onClick}>
       <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color="orange" emissive="yellow" emissiveIntensity={1} />
+      <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
       <Text
         position={[0, 0, 1.1]}
         fontSize={0.3}
-        color="white"
+        color="black"
         anchorX="center"
         anchorY="middle"
       >
@@ -96,7 +96,7 @@ const ThreeScene = () => {
   return (
     <Canvas
       style={{ width: '100vw', height: '100vh' }}
-      camera={{ position: [0, 0, 10], fov: 15 }}
+      camera={{ position: [0, 3, 10], fov: 15 }}
       shadows
     >
       <ambientLight intensity={0.5} />
@@ -106,12 +106,12 @@ const ThreeScene = () => {
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls />
       <SpotlightWithTarget />
-      <ClickableBox position={[-5, 0, 0]} label="About" onClick={() => handleBoxClick('About')} />
-      <ClickableBox position={[0, 0, 0]} label="Contact" onClick={() => handleBoxClick('Contact')} />
-      <ClickableBox position={[5, 0, 0]} label="Projects" onClick={() => handleBoxClick('Projects')} />
-      <ClickableBox position={[10, 0, 0]} label="Policy" onClick={() => handleBoxClick('Policy')} />
+      <ClickableBox position={[-5, 2, 0]} label="About" onClick={() => handleBoxClick('About')} />
+      <ClickableBox position={[0, -2, 0]} label="Contact" onClick={() => handleBoxClick('Contact')} />
+      <ClickableBox position={[5, 2, 0]} label="Projects" onClick={() => handleBoxClick('Projects')} />
+      <ClickableBox position={[10, -2, 0]} label="Policy" onClick={() => handleBoxClick('Policy')} />
       <Text
-        fontSize={0.5}
+        fontSize={0.3}
         color="white"
         position={[0, 3, 0]}
         anchorX="center"
