@@ -30,6 +30,24 @@ const RotatingText = () => {
   );
 };
 
+const Background = () => {
+  const meshRef = useRef();
+
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x += 0.01;
+      meshRef.current.rotation.y += 0.01;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 0, -10]}>
+      <planeBufferGeometry args={[50, 50]} />
+      <meshBasicMaterial attach="material" color="purple" />
+    </mesh>
+  );
+};
+
 const SecondaryCamera = () => {
   const { scene, gl, size, mouse } = useThree();
   const secondaryCameraRef = useRef();
@@ -63,9 +81,10 @@ const SecondaryCamera = () => {
 
 const ThreeScene = () => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100vw', height: '100vh', background: 'linear-gradient(to bottom, #ff7e5f, #feb47b)' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
+      <Background />
       <RotatingText />
       <SecondaryCamera />
     </Canvas>
@@ -73,3 +92,4 @@ const ThreeScene = () => {
 };
 
 export default ThreeScene;
+
