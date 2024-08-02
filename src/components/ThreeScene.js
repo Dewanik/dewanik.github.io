@@ -2,12 +2,9 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-
-// Extend to use non-standard Three.js objects
-extend(THREE);
 
 const RotatingText = () => {
   const textRef = useRef();
@@ -33,20 +30,20 @@ const RotatingText = () => {
   );
 };
 
-const Background = () => {
+const JungleBackground = () => {
   const meshRef = useRef();
 
   useFrame(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.x += 0.01;
-      meshRef.current.rotation.y += 0.01;
+      meshRef.current.rotation.x += 0.005;
+      meshRef.current.rotation.y += 0.005;
     }
   });
 
   return (
-    <mesh ref={meshRef} position={[0, 0, -10]}>
-      <planeGeometry args={[50, 50]} />
-      <meshBasicMaterial attach="material" color="purple" />
+    <mesh ref={meshRef} position={[0, 0, -20]}>
+      <boxGeometry args={[100, 100, 1]} />
+      <meshBasicMaterial attach="material" color="green" />
     </mesh>
   );
 };
@@ -58,31 +55,44 @@ const CircularViewport = () => {
   useFrame(() => {
     if (secondaryCameraRef.current) {
       // Move the secondary camera with the mouse
-      secondaryCameraRef.current.position.x = mouse.x * 10;
-      secondaryCameraRef.current.position.y = mouse.y * 10;
-      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0));
+      secondaryCameraRef.current.position.x = mouse.x * 20;
+      secondaryCameraRef.current.position.y = mouse.y * 20;
+      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 20, mouse.y * 20, 0));
 
       // Render secondary camera view in a circular viewport
       gl.autoClear = false;
       gl.clearDepth();
 
-      const viewportSize = 200;
+      const viewportSize = 150;
       const viewportX = size.width - viewportSize - 20; // Fixed position in bottom right corner
       const viewportY = size.height - viewportSize - 20;
-
-      const maskCanvas = document.createElement('canvas');
-      maskCanvas.width = viewportSize;
-      maskCanvas.height = viewportSize;
-      const maskContext = maskCanvas.getContext('2d');
-      maskContext.beginPath();
-      maskContext.arc(viewportSize / 2, viewportSize / 2, viewportSize / 2, 0, Math.PI * 2);
-      maskContext.closePath();
-      maskContext.fill();
 
       gl.setScissorTest(true);
       gl.setScissor(viewportX, viewportY, viewportSize, viewportSize);
       gl.setViewport(viewportX, viewportY, viewportSize, viewportSize);
+      
+      // Use stencil buffer to create circular viewport
+      const stencilBuffer = new Uint8Array(viewportSize * viewportSize * 4);
+      gl.readPixels(viewportX, viewportY, viewportSize, viewportSize, gl.RGBA, gl.UNSIGNED_BYTE, stencilBuffer);
+
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+
+      gl.enable(gl.STENCIL_TEST);
+      gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+      gl.colorMask(false, false, false, false);
+      gl.depthMask(false);
+      
+      gl.drawPixels(stencilBuffer, viewportSize, viewportSize, viewportX, viewportY);
+
+      gl.colorMask(true, true, true, true);
+      gl.depthMask(true);
+      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+
       gl.render(scene, secondaryCameraRef.current);
+      
+      gl.disable(gl.STENCIL_TEST);
       gl.setScissorTest(false);
       gl.autoClear = true;
     }
@@ -93,10 +103,10 @@ const CircularViewport = () => {
 
 const ThreeScene = () => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', background: 'linear-gradient(to bottom, #ff7e5f, #feb47b)' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100vw', height: '100vh', background: 'linear-gradient(to bottom, #ff7e5f, #feb47b)' }} camera={{ position: [0, 0, 50], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Background />
+      <JungleBackground />
       <RotatingText />
       <CircularViewport />
     </Canvas>
