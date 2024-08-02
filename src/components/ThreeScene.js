@@ -69,7 +69,7 @@ const SpotlightWithTarget = () => {
   );
 };
 
-const ClickableBox = ({ position, label, onMouseDown, onMouseUp }) => {
+const RandomBox = ({ position, label, onMouseDown, onMouseUp }) => {
   const boxRef = useRef();
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -87,15 +87,17 @@ const ClickableBox = ({ position, label, onMouseDown, onMouseUp }) => {
     >
       <boxGeometry args={[2, 2, 2]} />
       <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
-      <Text
-        position={[0, 0, 1.1]}
-        fontSize={0.3}
-        color="black"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {label}
-      </Text>
+      {label && (
+        <Text
+          position={[0, 0, 1.1]}
+          fontSize={0.3}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {label}
+        </Text>
+      )}
     </mesh>
   );
 };
@@ -111,6 +113,28 @@ const ThreeScene = () => {
     isMousePressed.current = false;
   };
 
+  const randomPositions = [
+    [-5, 2, 0],
+    [0, -2, 0],
+    [5, 2, 0],
+    [10, -2, 0],
+    [-10, -2, 0],
+    [8, 3, 0],
+    [-7, 5, 0],
+    [3, -5, 0],
+  ];
+
+  const labels = [
+    "About",
+    "Contact",
+    "Projects",
+    "Policy",
+    "",
+    "",
+    "",
+    "",
+  ];
+
   return (
     <Canvas
       style={{ width: '100vw', height: '100vh' }}
@@ -124,30 +148,15 @@ const ThreeScene = () => {
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls isMousePressed={isMousePressed} />
       <SpotlightWithTarget />
-      <ClickableBox
-        position={[-5, 2, 0]}
-        label="About"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      />
-      <ClickableBox
-        position={[0, -2, 0]}
-        label="Contact"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      />
-      <ClickableBox
-        position={[5, 2, 0]}
-        label="Projects"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      />
-      <ClickableBox
-        position={[10, -2, 0]}
-        label="Policy"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      />
+      {randomPositions.map((position, index) => (
+        <RandomBox
+          key={index}
+          position={position}
+          label={labels[index]}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+        />
+      ))}
       <Text
         fontSize={0.3}
         color="white"
