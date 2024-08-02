@@ -39,13 +39,13 @@ const SecondaryCamera = () => {
     if (secondaryCameraRef.current) {
       secondaryCameraRef.current.position.x = mouse.x * 10;
       secondaryCameraRef.current.position.y = mouse.y * 10;
-      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0)); // Ensure the camera looks at the mouse position
+      secondaryCameraRef.current.lookAt(new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0));
 
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
-      const viewportWidth = 200; // Smaller viewport width
-      const viewportHeight = 200; // Smaller viewport height
+      const viewportWidth = 200;
+      const viewportHeight = 200;
       const viewportX = size.width - viewportWidth - 20; // Fixed position in bottom right corner
       const viewportY = size.height - viewportHeight - 20;
 
@@ -58,7 +58,7 @@ const SecondaryCamera = () => {
     }
   });
 
-  return <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={1} position={[0, 0, 10]} />;
+  return <perspectiveCamera ref={secondaryCameraRef} fov={30} aspect={size.width / size.height} position={[0, 0, 10]} />;
 };
 
 const ThreeScene = () => {
