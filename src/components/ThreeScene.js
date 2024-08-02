@@ -2,10 +2,9 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
 const CameraControls = () => {
   const { camera } = useThree();
@@ -94,7 +93,7 @@ const ThreeScene = () => {
   return (
     <Canvas
       style={{ width: '100vw', height: '100vh' }}
-      camera={{ position: [0, 0, 10], fov: 25 }}
+      camera={{ position: [0, 0, 10], fov: 15 }}
       shadows
     >
       <ambientLight intensity={0.5} />
@@ -116,9 +115,6 @@ const ThreeScene = () => {
         Software Company of
         Birtamode, Jhapa, NP
       </Text>
-      <EffectComposer>
-        <Bloom luminanceThreshold={0.3} luminanceSmoothing={0.9} height={300} />
-      </EffectComposer>
     </Canvas>
   );
 };
