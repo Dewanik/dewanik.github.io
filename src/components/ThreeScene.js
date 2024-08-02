@@ -6,7 +6,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-const RotatingText = () => {
+const MainText = () => {
   return (
     <Text
       fontSize={1}
@@ -37,6 +37,11 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
   }, [scene]);
 
   useFrame(() => {
+    if (spotlightTargetRef.current) {
+      spotlightTargetRef.current.position.x = mouse.x * 10;
+      spotlightTargetRef.current.position.y = mouse.y * 10;
+    }
+
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
@@ -46,25 +51,14 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
-      const viewportWidth = size.width;
-      const viewportHeight = size.height;
-
       gl.setScissorTest(true);
-      gl.setScissor(0, 0, viewportWidth, viewportHeight);
-      gl.setViewport(0, 0, viewportWidth, viewportHeight);
+      gl.setScissor(0, 0, size.width, size.height);
+      gl.setViewport(0, 0, size.width, size.height);
       gl.render(scene, cameraRef.current);
       gl.setScissorTest(false);
       gl.autoClear = true;
     }
   });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      spotlightTargetRef.current.position.set(...targetPositions[Math.floor(Math.random() * targetPositions.length)]);
-    }, 2000); // Change target every 2 seconds
-
-    return () => clearInterval(interval);
-  }, [targetPositions]);
 
   return (
     <>
@@ -108,9 +102,9 @@ const ThreeScene = () => {
 
   return (
     <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.1} />
       <pointLight position={[10, 10, 10]} />
-      <RotatingText />
+      <MainText />
       <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
     </Canvas>
   );
