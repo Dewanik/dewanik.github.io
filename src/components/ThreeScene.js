@@ -1,7 +1,7 @@
 // components/ThreeScene.js
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -69,7 +69,7 @@ const SpotlightWithTarget = () => {
   );
 };
 
-const RandomBox = ({ position, label, onMouseDown, onMouseUp }) => {
+const ClickableBox = ({ position, label, onMouseDown, onMouseUp }) => {
   const boxRef = useRef();
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -85,12 +85,12 @@ const RandomBox = ({ position, label, onMouseDown, onMouseUp }) => {
       onPointerDown={onMouseDown}
       onPointerUp={onMouseUp}
     >
-      <boxGeometry args={[2, 2, 2]} />
+      <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
       {label && (
         <Text
-          position={[0, 0, 1.1]}
-          fontSize={0.3}
+          position={[0, 0, 0.6]}
+          fontSize={0.2}
           color="black"
           anchorX="center"
           anchorY="middle"
@@ -113,15 +113,15 @@ const ThreeScene = () => {
     isMousePressed.current = false;
   };
 
-  const randomPositions = [
-    [-5, 2, 0],
-    [0, -2, 0],
-    [5, 2, 0],
-    [10, -2, 0],
-    [-10, -2, 0],
-    [8, 3, 0],
-    [-7, 5, 0],
-    [3, -5, 0],
+  const boxPositions = [
+    [-2, 1, 0],
+    [-1, -1, 0],
+    [1, 1, 0],
+    [2, -1, 0],
+    [-3, -1, 0],
+    [3, 2, 0],
+    [-4, 2, 0],
+    [4, -2, 0],
   ];
 
   const labels = [
@@ -148,8 +148,8 @@ const ThreeScene = () => {
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls isMousePressed={isMousePressed} />
       <SpotlightWithTarget />
-      {randomPositions.map((position, index) => (
-        <RandomBox
+      {boxPositions.map((position, index) => (
+        <ClickableBox
           key={index}
           position={position}
           label={labels[index]}
@@ -158,9 +158,9 @@ const ThreeScene = () => {
         />
       ))}
       <Text
-        fontSize={0.3}
+        fontSize={0.5}
         color="white"
-        position={[0, 3, 0]}
+        position={[0, 0, 0]}
         anchorX="center"
         anchorY="middle"
       >
