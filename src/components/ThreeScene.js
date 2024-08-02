@@ -2,9 +2,12 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Extend to use non-standard Three.js objects
+extend(THREE);
 
 const RotatingText = () => {
   const textRef = useRef();
@@ -42,7 +45,7 @@ const Background = () => {
 
   return (
     <mesh ref={meshRef} position={[0, 0, -10]}>
-      <planeBufferGeometry args={[50, 50]} />
+      <planeGeometry args={[50, 50]} />
       <meshBasicMaterial attach="material" color="purple" />
     </mesh>
   );
@@ -92,4 +95,3 @@ const ThreeScene = () => {
 };
 
 export default ThreeScene;
-
