@@ -58,7 +58,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-      cameraRef.current.lookAt(spotlightRef.current.target.position);
+   
 
       // Render secondary camera view
       gl.autoClear = false;
