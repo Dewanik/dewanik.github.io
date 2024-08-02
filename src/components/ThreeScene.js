@@ -21,39 +21,54 @@ const MainText = () => {
   );
 };
 
-const Spotlight = ({ targetPositions, targetTexts }) => {
+const MovingText = ({ position, text }) => {
+  return (
+    <Text
+      fontSize={0.5}
+      color="white"
+      position={position}
+      anchorX="center"
+      anchorY="middle">
+      {text}
+    </Text>
+  );
+};
+
+const Spotlight = () => {
   const spotlightRef = useRef();
-  const spotlightTargetRef = useRef(new THREE.Object3D());
   const { scene, gl, size, mouse } = useThree();
   const cameraRef = useRef();
 
   useEffect(() => {
     if (spotlightRef.current) {
       const spotlight = spotlightRef.current;
-      const spotlightTarget = spotlightTargetRef.current;
+      const spotlightTarget = new THREE.Object3D();
       scene.add(spotlightTarget);
       spotlight.target = spotlightTarget;
     }
   }, [scene]);
 
   useFrame(() => {
-    if (spotlightTargetRef.current) {
-      spotlightTargetRef.current.position.x = mouse.x * 10;
-      spotlightTargetRef.current.position.y = mouse.y * 10;
-    }
-
     // Move the secondary camera with the mouse
     if (cameraRef.current) {
       cameraRef.current.position.x = mouse.x * 10;
       cameraRef.current.position.y = mouse.y * 10;
-      cameraRef.current.lookAt(spotlightTargetRef.current.position);
+
+      // Update spotlight target position
+      const spotlightTarget = spotlightRef.current.target;
+      spotlightTarget.position.set(mouse.x * 10, mouse.y * 10, 0);
 
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
+      const viewportWidth = 200;
+      const viewportHeight = 200;
+      const viewportX = mouse.x * (size.width - viewportWidth);
+      const viewportY = mouse.y * (size.height - viewportHeight);
+
       gl.setScissorTest(true);
-      gl.setScissor(0, 0, size.width, size.height);
-      gl.setViewport(0, 0, size.width, size.height);
+      gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
+      gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
       gl.render(scene, cameraRef.current);
       gl.setScissorTest(false);
       gl.autoClear = true;
@@ -70,34 +85,26 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
         intensity={1}
         castShadow
       />
-      <perspectiveCamera ref={cameraRef} fov={75} aspect={size.width / size.height} position={[0, 0, 10]} />
-      {targetTexts.map((text, index) => (
-        <Text
-          key={index}
-          fontSize={0.5}
-          color="white"
-          position={targetPositions[index]}
-          anchorX="center"
-          anchorY="middle">
-          {text}
-        </Text>
-      ))}
+      <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
     </>
   );
 };
 
 const ThreeScene = () => {
-  // Positions for "about", "contact", "privacy policy" around the page
   const targetPositions = [
-    [2, 2, 0], // About
-    [-2, 2, 0], // Contact
-    [0, -2, 0], // Privacy Policy
+    [5, 5, 0], // About
+    [-5, 5, 0], // Contact
+    [0, -5, 0], // Privacy Policy
+    [5, -5, 0], // Home
+    [-5, -5, 0], // Services
   ];
 
   const targetTexts = [
     "About",
     "Contact",
     "Privacy Policy",
+    "Home",
+    "Services"
   ];
 
   return (
@@ -105,7 +112,10 @@ const ThreeScene = () => {
       <ambientLight intensity={0.1} />
       <pointLight position={[10, 10, 10]} />
       <MainText />
-      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
+      <Spotlight />
+      {targetTexts.map((text, index) => (
+        <MovingText key={index} position={targetPositions[index]} text={text} />
+      ))}
     </Canvas>
   );
 };
