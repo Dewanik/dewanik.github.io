@@ -7,37 +7,9 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const RotatingText = () => {
-  const textRef = useRef();
-  const [fontSize, setFontSize] = useState(1);
-
-  // Adjust font size based on window width
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setFontSize(0.5); // Smaller font size for mobile
-      } else {
-        setFontSize(1); // Default font size for desktop
-      }
-    };
-
-    handleResize(); // Set initial values
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  useFrame(() => {
-    if (textRef.current) {
-      textRef.current.rotation.y += 0.01;
-    }
-  });
-
   return (
     <Text
-      ref={textRef}
-      fontSize={fontSize}
+      fontSize={1}
       color="white"
       position={[0, 0, 0]}
       anchorX="center"
@@ -74,14 +46,12 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
       // Render secondary camera view
       gl.autoClear = false;
       gl.clearDepth();
-      const viewportWidth = 200;
-      const viewportHeight = 200;
-      const viewportX = mouse.x * (size.width - viewportWidth);
-      const viewportY = mouse.y * (size.height - viewportHeight);
+      const viewportWidth = size.width;
+      const viewportHeight = size.height;
 
       gl.setScissorTest(true);
-      gl.setScissor(viewportX, viewportY, viewportWidth, viewportHeight);
-      gl.setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+      gl.setScissor(0, 0, viewportWidth, viewportHeight);
+      gl.setViewport(0, 0, viewportWidth, viewportHeight);
       gl.render(scene, cameraRef.current);
       gl.setScissorTest(false);
       gl.autoClear = true;
@@ -106,7 +76,7 @@ const Spotlight = ({ targetPositions, targetTexts }) => {
         intensity={1}
         castShadow
       />
-      <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
+      <perspectiveCamera ref={cameraRef} fov={75} aspect={size.width / size.height} position={[0, 0, 10]} />
       {targetTexts.map((text, index) => (
         <Text
           key={index}
@@ -137,11 +107,11 @@ const ThreeScene = () => {
   ];
 
   return (
-    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100vw', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
       <RotatingText />
+      <Spotlight targetPositions={targetPositions} targetTexts={targetTexts} />
     </Canvas>
   );
 };
