@@ -157,7 +157,8 @@ const ThreeScene = () => {
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        boxShadow: '0 0 15px 15px rgba(255, 255, 255, 0.5)',
       }}>
         <Canvas style={{ borderRadius: '50%' }} camera={{ position: [0, 1, 5], fov: 10 }}>
           <ambientLight intensity={0.5} />
