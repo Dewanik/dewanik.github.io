@@ -3,29 +3,35 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { PointerLockControls } from '@react-three/drei';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const CameraControls = () => {
-  const { camera, gl } = useThree();
-  const controls = useRef();
+  const { camera } = useThree();
+  const mouse = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useFrame(() => {
-    if (controls.current) {
-      controls.current.update();
-    }
+    camera.rotation.x = mouse.current.y * Math.PI * 0.1;
+    camera.rotation.y = mouse.current.x * Math.PI * 0.1;
   });
 
-  return (
-    <PointerLockControls ref={controls} args={[camera, gl.domElement]} />
-  );
+  return null;
 };
 
 const SpotlightWithTarget = () => {
   const spotlightRef = useRef();
   const spotlightTargetRef = useRef(new THREE.Object3D());
-  const { scene, mouse, camera } = useThree();
+  const { scene, camera } = useThree();
 
   useEffect(() => {
     if (spotlightRef.current) {
@@ -38,13 +44,7 @@ const SpotlightWithTarget = () => {
 
   useFrame(() => {
     if (spotlightTargetRef.current) {
-      const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-      vector.unproject(camera);
-      const dir = vector.sub(camera.position).normalize();
-      const distance = -camera.position.z / dir.z;
-      const pos = camera.position.clone().add(dir.multiplyScalar(distance));
-
-      spotlightTargetRef.current.position.copy(pos);
+      spotlightTargetRef.current.position.copy(camera.position);
     }
   });
 
@@ -62,13 +62,48 @@ const SpotlightWithTarget = () => {
   );
 };
 
+const RandomBoxes = () => {
+  const groupRef = useRef();
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += 0.005;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {Array.from({ length: 20 }).map((_, i) => (
+        <mesh
+          key={i}
+          position={[
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 20,
+          ]}
+        >
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color={`hsl(${Math.random() * 360}, 100%, 50%)`} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
 const ThreeScene = () => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh' }} camera={{ position: [0, 0, 5], fov: 75 }}>
+    <Canvas
+      style={{ width: '100vw', height: '100vh' }}
+      camera={{ position: [0, 0, 10], fov: 75 }}
+      shadows
+    >
       <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      <pointLight position={[-10, -10, -10]} intensity={1} color="blue" />
+      <pointLight position={[10, -10, 10]} intensity={1} color="red" />
+      <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls />
       <SpotlightWithTarget />
+      <RandomBoxes />
       <Text
         fontSize={1}
         color="white"
