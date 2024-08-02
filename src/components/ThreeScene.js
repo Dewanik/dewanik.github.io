@@ -148,29 +148,41 @@ const ThreeScene = () => {
 
   return (
     <>
-      <Canvas style={{ width: '100vw', height: '100vh' }} camera={{ position: [0, 1, 5], fov: 10 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <pointLight position={[-10, -10, -10]} intensity={1} color="blue" />
-        <CameraControls direction={direction} />
-        {randomPositions.map((position, index) => (
-          <RandomBox key={index} position={position} />
-        ))}
-        {labeledPositions.map((position, index) => (
-          <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
-        ))}
-        <Text
-          fontSize={0.5}
-          color="white"
-          position={[0, 0, 0]}
-          anchorX="center"
-          anchorY="middle"
-        >
-          Yantra Inc,
-          Software Company of
-          Birtamode, Jhapa, NP
-        </Text>
-      </Canvas>
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'black',
+        overflow: 'hidden',
+        borderRadius: '50%',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Canvas style={{ borderRadius: '50%' }} camera={{ position: [0, 1, 5], fov: 10 }}>
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} intensity={1} />
+          <pointLight position={[-10, -10, -10]} intensity={1} color="blue" />
+          <CameraControls direction={direction} />
+          {randomPositions.map((position, index) => (
+            <RandomBox key={index} position={position} />
+          ))}
+          {labeledPositions.map((position, index) => (
+            <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
+          ))}
+          <Text
+            fontSize={0.5}
+            color="white"
+            position={[0, 0, 0]}
+            anchorX="center"
+            anchorY="middle"
+          >
+            Yantra Inc,
+            Software Company of
+            Birtamode, Jhapa, NP
+          </Text>
+        </Canvas>
+      </div>
       <ControllerInterface onDirectionChange={handleDirectionChange} />
     </>
   );
