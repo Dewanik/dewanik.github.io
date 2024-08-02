@@ -3,9 +3,8 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, MeshWobbleMaterial } from '@react-three/drei';
 import * as THREE from 'three';
-import { useRouter } from 'next/router';
 
 const CameraControls = () => {
   const { camera } = useThree();
@@ -63,17 +62,11 @@ const SpotlightWithTarget = () => {
   );
 };
 
-const ClickableBox = ({ position, label, href }) => {
-  const router = useRouter();
-
-  const handlePointerDown = () => {
-    router.push(href);
-  };
-
+const ClickableBox = ({ position, label, onClick }) => {
   return (
-    <mesh position={position} onPointerDown={handlePointerDown}>
+    <mesh position={position} onPointerDown={onClick}>
       <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color="orange" />
+      <meshStandardMaterial color="orange" emissive="yellow" emissiveIntensity={1} />
       <Text
         position={[0, 0, 1.1]}
         fontSize={0.5}
@@ -88,6 +81,10 @@ const ClickableBox = ({ position, label, href }) => {
 };
 
 const ThreeScene = () => {
+  const handleBoxClick = (label) => {
+    alert(`Navigating to ${label} page...`);
+  };
+
   return (
     <Canvas
       style={{ width: '100vw', height: '100vh' }}
@@ -101,10 +98,10 @@ const ThreeScene = () => {
       <pointLight position={[-10, 10, -10]} intensity={1} color="green" />
       <CameraControls />
       <SpotlightWithTarget />
-      <ClickableBox position={[-5, 0, 0]} label="About" href="/about" />
-      <ClickableBox position={[0, 0, 0]} label="Contact" href="/contact" />
-      <ClickableBox position={[5, 0, 0]} label="Projects" href="/projects" />
-      <ClickableBox position={[10, 0, 0]} label="Policy" href="/policy" />
+      <ClickableBox position={[-5, 0, 0]} label="About" onClick={() => handleBoxClick('About')} />
+      <ClickableBox position={[0, 0, 0]} label="Contact" onClick={() => handleBoxClick('Contact')} />
+      <ClickableBox position={[5, 0, 0]} label="Projects" onClick={() => handleBoxClick('Projects')} />
+      <ClickableBox position={[10, 0, 0]} label="Policy" onClick={() => handleBoxClick('Policy')} />
       <Text
         fontSize={0.5}
         color="white"
