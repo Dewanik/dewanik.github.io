@@ -137,7 +137,7 @@ const CircularView = () => {
 
   return (
     <mesh>
-      <planeBufferGeometry args={[2, 2]} />
+      <planeGeometry args={[2, 2]} />
       <shaderMaterial
         ref={shaderMaterial}
         uniforms={{ tDiffuse: { value: null } }}
