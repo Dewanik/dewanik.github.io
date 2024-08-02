@@ -15,6 +15,8 @@ const CameraControls = ({ direction }) => {
     if (direction.backward) camera.position.z += speed;
     if (direction.left) camera.position.x -= speed;
     if (direction.right) camera.position.x += speed;
+    if (direction.up) camera.position.y += speed;
+    if (direction.down) camera.position.y -= speed;
   });
 
   return null;
@@ -62,14 +64,27 @@ const ControllerInterface = ({ onDirectionChange }) => {
   return (
     <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1 }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div
-          style={buttonStyle}
-          onMouseDown={() => onDirectionChange('forward', true)}
-          onMouseUp={() => onDirectionChange('forward', false)}
-          onTouchStart={() => onDirectionChange('forward', true)}
-          onTouchEnd={() => onDirectionChange('forward', false)}
-        >
-          ↑
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('up', true)}
+            onMouseUp={() => onDirectionChange('up', false)}
+            onTouchStart={() => onDirectionChange('up', true)}
+            onTouchEnd={() => onDirectionChange('up', false)}
+          >
+            ↑
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('forward', true)}
+            onMouseUp={() => onDirectionChange('forward', false)}
+            onTouchStart={() => onDirectionChange('forward', true)}
+            onTouchEnd={() => onDirectionChange('forward', false)}
+          >
+            ↑
+          </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div
@@ -91,14 +106,27 @@ const ControllerInterface = ({ onDirectionChange }) => {
             →
           </div>
         </div>
-        <div
-          style={buttonStyle}
-          onMouseDown={() => onDirectionChange('backward', true)}
-          onMouseUp={() => onDirectionChange('backward', false)}
-          onTouchStart={() => onDirectionChange('backward', true)}
-          onTouchEnd={() => onDirectionChange('backward', false)}
-        >
-          ↓
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('backward', true)}
+            onMouseUp={() => onDirectionChange('backward', false)}
+            onTouchStart={() => onDirectionChange('backward', true)}
+            onTouchEnd={() => onDirectionChange('backward', false)}
+          >
+            ↓
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={buttonStyle}
+            onMouseDown={() => onDirectionChange('down', true)}
+            onMouseUp={() => onDirectionChange('down', false)}
+            onTouchStart={() => onDirectionChange('down', true)}
+            onTouchEnd={() => onDirectionChange('down', false)}
+          >
+            ↓
+          </div>
         </div>
       </div>
     </div>
@@ -111,6 +139,8 @@ const ThreeScene = () => {
     backward: false,
     left: false,
     right: false,
+    up: false,
+    down: false,
   });
 
   const handleDirectionChange = (dir, state) => {
@@ -172,7 +202,7 @@ const ThreeScene = () => {
             <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
           ))}
           <Text
-            fontSize={0.1}
+            fontSize={0.3}
             color="white"
             position={[0, 0, 0]}
             anchorX="center"
