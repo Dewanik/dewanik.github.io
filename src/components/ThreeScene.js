@@ -20,7 +20,7 @@ const CameraControls = ({ direction }) => {
   return null;
 };
 
-const RandomBox = ({ position }) => {
+const RandomBox = ({ position, label, onClick }) => {
   const boxRef = useRef();
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -30,9 +30,20 @@ const RandomBox = ({ position }) => {
   });
 
   return (
-    <mesh ref={boxRef} position={position}>
+    <mesh ref={boxRef} position={position} onClick={onClick}>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.2} />
+      {label && (
+        <Text
+          position={[0, 0, 0.6]}
+          fontSize={0.2}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {label}
+        </Text>
+      )}
     </mesh>
   );
 };
@@ -106,6 +117,24 @@ const ThreeScene = () => {
     setDirection((prev) => ({ ...prev, [dir]: state }));
   };
 
+  const handleClick = (label) => {
+    alert(`Clicked on ${label}`);
+  };
+
+  const labeledPositions = [
+    [-3, 1, -5],
+    [3, -1, -10],
+    [-1, -2, -15],
+    [1, 2, -20],
+  ];
+
+  const labels = [
+    "About",
+    "Contact",
+    "Projects",
+    "Policy",
+  ];
+
   const randomPositions = [
     [-5, 1, -5],
     [3, -1, -10],
@@ -126,6 +155,9 @@ const ThreeScene = () => {
         <CameraControls direction={direction} />
         {randomPositions.map((position, index) => (
           <RandomBox key={index} position={position} />
+        ))}
+        {labeledPositions.map((position, index) => (
+          <RandomBox key={index} position={position} label={labels[index]} onClick={() => handleClick(labels[index])} />
         ))}
         <Text
           fontSize={0.5}
