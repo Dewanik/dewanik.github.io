@@ -3,20 +3,24 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Sphere } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 const RotatingText = () => {
   const textRef = useRef();
+  const { mouse } = useThree();
   const [fontSize, setFontSize] = useState(1);
+  const [rotationMultiplier, setRotationMultiplier] = useState(2);
 
   // Adjust font size based on window width
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setFontSize(0.5); // Smaller font size for mobile
+        setRotationMultiplier(1); // Less sensitive rotation for mobile
       } else {
         setFontSize(1); // Default font size for desktop
+        setRotationMultiplier(2); // Default rotation sensitivity for desktop
       }
     };
 
@@ -30,7 +34,8 @@ const RotatingText = () => {
 
   useFrame(() => {
     if (textRef.current) {
-      textRef.current.rotation.y += 0.01;
+      textRef.current.rotation.y = mouse.x * rotationMultiplier;
+      textRef.current.rotation.x = -mouse.y * rotationMultiplier;
     }
   });
 
@@ -49,12 +54,10 @@ const RotatingText = () => {
   );
 };
 
-const Spotlight = ({ targetPositions }) => {
+const Spotlight = () => {
   const spotlightRef = useRef();
   const spotlightTargetRef = useRef(new THREE.Object3D());
-  const { scene, gl, size } = useThree();
-  const [currentTarget, setCurrentTarget] = useState(0);
-  const cameraRef = useRef();
+  const { mouse, scene } = useThree();
 
   useEffect(() => {
     if (spotlightRef.current) {
@@ -68,65 +71,32 @@ const Spotlight = ({ targetPositions }) => {
   useFrame(() => {
     const spotlightTarget = spotlightTargetRef.current;
     if (spotlightTarget) {
-      const targetPosition = targetPositions[currentTarget];
-      spotlightTarget.position.lerp(
-        new THREE.Vector3(...targetPosition),
-        0.05
+      spotlightTarget.position.set(
+        (mouse.x * window.innerWidth) / 2,
+        (mouse.y * window.innerHeight) / 2,
+        0
       );
-    }
-
-    // Render secondary camera view
-    if (cameraRef.current) {
-      gl.autoClear = false;
-      gl.clearDepth();
-      gl.setScissorTest(true);
-      gl.setScissor(size.width - 200, size.height - 200, 200, 200);
-      gl.setViewport(size.width - 200, size.height - 200, 200, 200);
-      gl.render(scene, cameraRef.current);
-      gl.setScissorTest(false);
-      gl.autoClear = true;
     }
   });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTarget((prevTarget) => (prevTarget + 1) % targetPositions.length);
-    }, 2000); // Change target every 2 seconds
-
-    return () => clearInterval(interval);
-  }, [targetPositions]);
-
   return (
-    <>
-      <spotLight
-        ref={spotlightRef}
-        position={[0, 0, 10]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={1}
-        castShadow
-      />
-      <Sphere ref={spotlightTargetRef} args={[0.1, 32, 32]} position={[0, 0, 0]}>
-        <meshBasicMaterial attach="material" color="red" />
-      </Sphere>
-      <perspectiveCamera ref={cameraRef} fov={75} aspect={1} position={[0, 0, 10]} />
-    </>
+    <spotLight
+      ref={spotlightRef}
+      position={[0, 0, 10]}
+      angle={0.3}
+      penumbra={0.5}
+      intensity={1}
+      castShadow
+    />
   );
 };
 
 const ThreeScene = () => {
-  // Positions for "about", "contact", "privacy policy" around the page
-  const targetPositions = [
-    [2, 2, 0], // About
-    [-2, 2, 0], // Contact
-    [0, -2, 0], // Privacy Policy
-  ];
-
   return (
-    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }} camera={{ position: [0, 0, 15], fov: 75 }}>
+    <Canvas style={{ width: '100%', height: '100vh', background: '#000000' }}>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Spotlight targetPositions={targetPositions} />
+      <Spotlight />
       <RotatingText />
     </Canvas>
   );
