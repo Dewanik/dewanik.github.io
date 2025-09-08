@@ -8,19 +8,51 @@
 </head>
 <body>
     <header>
-        <h1>List of Accessible GitHub Pages</h1>
+        <h1>Accessible GitHub Pages</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+            </ul>
+        </nav>
     </header>
     <main>
         <section>
-            <h2>Available Pages</h2>
-            <ul>
-                <li><a href="https://github.com/microsoft/vscode-extension-samples/tree/main/notebook-renderer-sample">Notebook Renderer Sample</a> - A sample demonstrating how to create a notebook renderer.</li>
-                <!-- Add more links to other GitHub Pages here -->
+            <h2>Repositories with GitHub Pages</h2>
+            <ul id="pages-list">
+                <li>Loading...</li>
             </ul>
         </section>
     </main>
     <footer>
         <p>&copy; 2023 GitHub Pages List</p>
     </footer>
+    <script>
+    // Fetch public repositories for the user
+    fetch('https://api.github.com/users/dewanik/repos?per_page=100')
+        .then(response => response.json())
+        .then(repos => {
+            const list = document.getElementById('pages-list');
+            list.innerHTML = '';
+            let found = false;
+            repos.forEach(repo => {
+                // Skip the special repo 'dewanik.github.io' (it's the root page)
+                if (repo.name === 'dewanik.github.io') return;
+                // Construct the expected GitHub Pages URL
+                const pagesUrl = `https://dewanik.github.io/${repo.name}/`;
+                // Optionally, you could check if the page exists by fetching the URL
+                // For now, just list all repos (most will 404 if no Pages is set up)
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${pagesUrl}" target="_blank">${pagesUrl}</a> &mdash; ${repo.description || ''}`;
+                list.appendChild(li);
+                found = true;
+            });
+            if (!found) {
+                list.innerHTML = '<li>No accessible GitHub Pages found.</li>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('pages-list').innerHTML = '<li>Failed to load repositories.</li>';
+        });
+    </script>
 </body>
 </html>
